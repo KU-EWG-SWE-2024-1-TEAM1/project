@@ -1,0 +1,9 @@
+db:
+  type: mysql
+  host: 'your-mysql-host'
+  port: 3306
+  username: 'your-username'
+  password: 'your-password'
+  database: 'your-database-name'
+  synchronize: true
+  logging: true
