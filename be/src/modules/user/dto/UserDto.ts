@@ -1,11 +1,12 @@
-import {IsString, IsEmail, IsEnum, IsOptional} from 'class-validator';
+import {IsString, IsEmail, IsOptional} from 'class-validator';
 
 export class PostUserDto {
     @IsString()
     name: string;
-
     @IsEmail()
     email: string;
+
+    nickName:string;
 }
 export class UpdateUserDto {
     @IsOptional()

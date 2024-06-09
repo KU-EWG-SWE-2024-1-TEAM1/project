@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/user/module';
-import { getTypeOrmConfig } from './dbconfig';
+import { getTypeOrmConfig } from './config/dbconfig';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 

@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from './modules/user/entity/User';
+import { User } from '../modules/user/entity/User';
 
 export const getTypeOrmConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const dbType = configService.get<'sqlite' | 'mysql'>('db.type');
