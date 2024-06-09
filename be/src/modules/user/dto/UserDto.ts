@@ -1,12 +1,11 @@
 import {IsString, IsEmail, IsOptional} from 'class-validator';
 
 export class PostUserDto {
-    @IsString()
+    @IsString({ message: 'Username must be contained.' })
     name: string;
-    @IsEmail()
+    @IsEmail({}, { message: 'invalid email address.' })
     email: string;
 
-    nickName:string;
 }
 export class UpdateUserDto {
     @IsOptional()
