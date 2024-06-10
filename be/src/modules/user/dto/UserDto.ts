@@ -16,3 +16,14 @@ export class UpdateUserDto {
     @IsString()
     readonly email?: string;
 }
+
+export class ResponseUserDto {
+    id: number;
+    name: string;
+    email: string;
+}
+
+export class AuthorUserDto {
+    id: number;
+    name: string;
+}

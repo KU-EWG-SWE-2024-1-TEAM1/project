@@ -3,8 +3,16 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../../src/modules/user/service/UserService';
 import { User } from '../../src/modules/user/entity/User';
+import { ResponseUserDto } from '../../src/modules/user/dto/UserDto';
 
-const mockUser = {
+const mockUser: User = {
+  id: 1,
+  name: 'tester',
+  email: 'test@test.com',
+  posts: [],
+};
+
+const mockResponseUserDto: ResponseUserDto = {
   id: 1,
   name: 'tester',
   email: 'test@test.com',
@@ -34,20 +42,29 @@ describe('UserService', () => {
   });
 
   it('should create a user', async () => {
-    jest.spyOn(repository, 'create').mockImplementation(() => mockUser as User);
-    jest.spyOn(repository, 'save').mockResolvedValue(mockUser as User);
+    jest.spyOn(repository, 'create').mockImplementation(() => mockUser);
+    jest.spyOn(repository, 'save').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'findOne').mockResolvedValue(null); // Ensure no duplicate email
 
-    const result = await service.create({ name: 'tester', email: 'test@test.com', });
+    const result = await service.create({ name: 'tester', email: 'test@test.com' });
 
-    expect(result).toEqual(mockUser);
+    expect(result).toEqual(mockResponseUserDto);
+  });
+
+  it('should throw an error if email already exists', async () => {
+    jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser); // Duplicate email
+
+    await expect(service.create({ name: 'tester', email: 'test@test.com' }))
+      .rejects
+      .toThrow('Email test@test.com already exists');
   });
 
   it('should find a user by ID', async () => {
-    jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser as User);
+    jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
 
     const result = await service.findOne(1);
 
-    expect(result).toEqual(mockUser);
+    expect(result).toEqual(mockResponseUserDto);
   });
 
   it('should throw an error if user not found', async () => {
@@ -57,24 +74,27 @@ describe('UserService', () => {
   });
 
   it('should return all users', async () => {
-    jest.spyOn(repository, 'find').mockResolvedValue([mockUser] as User[]);
+    jest.spyOn(repository, 'find').mockResolvedValue([mockUser]);
 
     const result = await service.findAll();
 
-    expect(result).toEqual([mockUser]);
+    expect(result).toEqual([mockResponseUserDto]);
   });
 
   it('should update a user', async () => {
-    jest.spyOn(service, 'findOne').mockResolvedValue(mockUser as User);
-    jest.spyOn(repository, 'save').mockResolvedValue({ ...mockUser, name: 'updatedUser' } as User);
+    const updatedUser: User = { ...mockUser, name: 'updatedUser' };
+    const updatedResponseUserDto: ResponseUserDto = { ...mockResponseUserDto, name: 'updatedUser' };
+
+    jest.spyOn(service, 'findOne').mockResolvedValue(mockResponseUserDto);
+    jest.spyOn(repository, 'save').mockResolvedValue(updatedUser);
 
     const result = await service.update(1, { name: 'updatedUser' });
 
-    expect(result.name).toEqual('updatedUser');
+    expect(result).toEqual(updatedResponseUserDto);
   });
 
   it('should delete a user', async () => {
-    jest.spyOn(service, 'findOne').mockResolvedValue(mockUser as User);
+    jest.spyOn(service, 'findOne').mockResolvedValue(mockResponseUserDto);
     jest.spyOn(repository, 'delete').mockResolvedValue({} as any);
 
     await service.remove(1);

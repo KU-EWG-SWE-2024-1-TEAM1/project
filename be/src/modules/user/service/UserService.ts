@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/User';
-import { PostUserDto, UpdateUserDto } from '../dto/UserDto';
+import { PostUserDto, UpdateUserDto, ResponseUserDto,} from '../dto/UserDto';
 
 @Injectable()
 export class UserService {
@@ -11,25 +11,29 @@ export class UserService {
       private readonly userRepository: Repository<User>,
     ) {}
 
-    async create(postUserDto: PostUserDto): Promise<User> {
+    async create(postUserDto: PostUserDto): Promise<ResponseUserDto> {
+        await this.ensureEmailNotExists(postUserDto.email);
         const user = this.userRepository.create(postUserDto);
-        return this.checkError(() => this.userRepository.save(user), 'Failed to create user');
+        const savedUser = await this.checkError(() => this.userRepository.save(user), 'Failed to create user');
+        return this.toResponseUserDto(savedUser);
     }
 
-    async findOne(id: number): Promise<User> {
+    async findOne(id: number): Promise<ResponseUserDto> {
         const user = await this.userRepository.findOne({ where: { id } });
         this.ensureExists(user, id);
-        return user;
+        return this.toResponseUserDto(user);
     }
 
-    async findAll(): Promise<User[]> {
-        return this.checkError(() => this.userRepository.find(), 'Failed to fetch users');
+    async findAll(): Promise<ResponseUserDto[]> {
+        const users = await this.checkError(() => this.userRepository.find(), 'Failed to fetch users');
+        return users.map(user => this.toResponseUserDto(user));
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<ResponseUserDto> {
         const user = await this.findOne(id);
         Object.assign(user, updateUserDto);
-        return this.checkError(() => this.userRepository.save(user), 'Failed to update user');
+        const updatedUser = await this.checkError(() => this.userRepository.save(user), 'Failed to update user');
+        return this.toResponseUserDto(updatedUser);
     }
 
     async remove(id: number): Promise<void> {
@@ -43,6 +47,13 @@ export class UserService {
         }
     }
 
+    private async ensureEmailNotExists(email: string): Promise<void> {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (user) {
+            throw new BadRequestException(`Email ${email} already exists`);
+        }
+    }
+
     private async checkError<T>(operation: () => Promise<T>, errorMessage: string): Promise<T> {
         try {
             return await operation();
@@ -50,5 +61,13 @@ export class UserService {
             throw new BadRequestException(errorMessage);
         }
     }
-}
 
+    private toResponseUserDto(user: User): ResponseUserDto {
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        };
+    }
+
+}
