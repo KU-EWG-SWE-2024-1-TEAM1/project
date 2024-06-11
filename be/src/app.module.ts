@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import { PostModule } from "./modules/post/module";
 import { MovieModule } from "./modules/movie/module";
 import {ConnectionModule} from "./modules/connection/module";
+import { CommentModule } from "./modules/comment/module";
 
 const ENV = process.env.NODE_ENV || 'dev';
 const configFilePath = `config/${ENV}.yaml`;
@@ -23,10 +24,13 @@ const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => getTypeOrmConfig(configService),
-      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        ...getTypeOrmConfig(configService),
+        autoLoadEntities: true,
+      }),      inject: [ConfigService],
+
     }),
-    ConnectionModule, UserModule,PostModule,MovieModule
+    ConnectionModule, UserModule,PostModule,MovieModule,CommentModule
   ],
 })
 export class AppModule {}

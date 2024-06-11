@@ -1,21 +1,20 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Post } from '../entity/Post';
 import { PostPostDto, UpdatePostDto, ResponsePostDto } from '../dto/PostDto';
 import { paginate, PaginationResult } from '../../../utils/pagination/pagination';
 import { PaginationDto } from '../../../utils/pagination/paginationDto';
-import { User } from '../../user/entity/User';
 import { mapToDto } from '../../../utils/mapper/mapper';
 import { AuthorUserDto } from '../../user/dto/UserDto';
 import { UserService } from "../../user/service/UserService";
+import { PostRepository } from "../repository/PostRepository";
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
-    private readonly userService: UserService,  // UserService 주입
+    @InjectRepository(PostRepository)
+    private readonly postRepository: PostRepository,
+    private readonly userService: UserService,
   ) {}
 
   async create(postPostDto: PostPostDto): Promise<ResponsePostDto> {
@@ -31,7 +30,7 @@ export class PostService {
   }
 
   async findOne(id: number): Promise<ResponsePostDto> {
-    const post = await this.postRepository.findOne({ where: { id }, relations: ['user'] });
+    const post = await this.postRepository.findById(id);
     this.ensureExists(post, id);
     return this.toResponsePostDto(post);
   }

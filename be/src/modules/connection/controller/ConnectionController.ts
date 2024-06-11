@@ -10,7 +10,7 @@ export class ConnectionController {
     return this.connectionService.getConnections();
   }
 
-  @Get('/:date')
+  @Get('/date/:date')
   async getDailyConnections(@Param('date') date: string): Promise<{ date: string; today: number; total: number }> {
     return this.connectionService.getDailyConnections(date);
   }

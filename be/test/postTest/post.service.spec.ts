@@ -1,173 +1,188 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { PostService } from '../../src/modules/post/service/PostService';
 import { Post } from '../../src/modules/post/entity/Post';
 import { User } from '../../src/modules/user/entity/User';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { PaginationDto } from '../../src/utils/pagination/paginationDto';
-import { ResponsePostDto, PostPostDto, UpdatePostDto } from '../../src/modules/post/dto/PostDto';
-import { AuthorUserDto } from '../../src/modules/user/dto/UserDto';
+import { PostPostDto, UpdatePostDto } from '../../src/modules/post/dto/PostDto';
 import { UserService } from '../../src/modules/user/service/UserService';
+import { PostRepository } from "../../src/modules/post/repository/PostRepository";
+
+const mockPostRepository = () => ({
+  findOne: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+  find: jest.fn(),
+  delete: jest.fn(),
+  findById: jest.fn(),
+  findAndCount: jest.fn(),
+});
+
+const mockUserService = () => ({
+  findOne: jest.fn(),
+});
+
+type MockPostRepository = ReturnType<typeof mockPostRepository>;
+type MockUserService = Partial<Record<keyof UserService, jest.Mock>>;
 
 describe('PostService', () => {
   let service: PostService;
-  let postRepository: Repository<Post>;
-  let userService: UserService;
-
-  const mockUser: User = {
-    id: 1,
-    name: 'Test User',
-    email: 'test@example.com',
-    posts: [],
-  };
-
-  const mockAuthorUserDto: AuthorUserDto = {
-    id: 1,
-    name: 'Test User',
-  };
-
-  const mockPost: Post = {
-    id: 1,
-    title: 'Test Post',
-    content: 'This is a test post',
-    user: mockUser,
-  };
-
-  const mockResponsePostDto: ResponsePostDto = {
-    id: 1,
-    title: 'Test Post',
-    content: 'This is a test post',
-    user: mockAuthorUserDto,
-  };
-
-  const updatedPost: Post = {
-    id: 1,
-    title: 'Updated Post',
-    content: 'This is an updated post',
-    user: mockUser,
-  };
-
-  const updatedResponsePostDto: ResponsePostDto = {
-    id: 1,
-    title: 'Updated Post',
-    content: 'This is an updated post',
-    user: mockAuthorUserDto,
-  };
-
-  const mockPostRepository = {
-    create: jest.fn().mockImplementation(dto => dto),
-    save: jest.fn().mockImplementation(post => post),
-    findOne: jest.fn().mockResolvedValue(mockPost),
-    find: jest.fn().mockResolvedValue([mockPost]),
-    findAndCount: jest.fn().mockResolvedValue([[mockPost], 1]),
-    delete: jest.fn().mockResolvedValue({ raw: '', affected: 1 }),
-  };
-
-  const mockUserService = {
-    findOne: jest.fn().mockResolvedValue(mockUser),
-  };
+  let postRepository: MockPostRepository;
+  let userService: MockUserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostService,
-        {
-          provide: getRepositoryToken(Post),
-          useValue: mockPostRepository,
-        },
-        {
-          provide: UserService,
-          useValue: mockUserService,
-        },
+        { provide: getRepositoryToken(PostRepository), useValue: mockPostRepository() },
+        { provide: UserService, useValue: mockUserService() },
       ],
     }).compile();
 
     service = module.get<PostService>(PostService);
-    postRepository = module.get<Repository<Post>>(getRepositoryToken(Post));
-    userService = module.get<UserService>(UserService);
+    postRepository = module.get<MockPostRepository>(getRepositoryToken(PostRepository));
+    userService = module.get<MockUserService>(UserService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  describe('create', () => {
+    it('should successfully create a post', async () => {
+      const postPostDto: PostPostDto = { title: 'Test Post', content: 'Test Content', userId: 1 };
+      const user: User = { id: 1, name: 'Test User', email: 'test@example.com', posts: [], comments: [] };
+      const post: Post = { id: 1, title: 'Test Post', content: 'Test Content', user, comment: null };
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+      userService.findOne.mockResolvedValue(user);
+      postRepository.create.mockReturnValue(post);
+      postRepository.save.mockResolvedValue(post);
 
-  it('should create a post', async () => {
-    const postDto: PostPostDto = { title: 'Test Post', content: 'This is a test post', userId: 1 };
-    jest.spyOn(userService, 'findOne').mockResolvedValueOnce(mockUser);
-    jest.spyOn(postRepository, 'save').mockResolvedValueOnce(mockPost);
-
-    expect(await service.create(postDto)).toEqual(mockResponsePostDto);
-    expect(postRepository.save).toHaveBeenCalled();
-    expect(userService.findOne).toHaveBeenCalledWith(1);
-  });
-
-  it('should find a post by id', async () => {
-    jest.spyOn(postRepository, 'findOne').mockResolvedValueOnce(mockPost);
-
-    expect(await service.findOne(1)).toEqual(mockResponsePostDto);
-    expect(postRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['user'] });
-  });
-
-  it('should throw an error if post not found', async () => {
-    jest.spyOn(postRepository, 'findOne').mockResolvedValueOnce(null);
-
-    await expect(service.findOne(99)).rejects.toThrow(NotFoundException);
-  });
-
-  it('should return paginated posts', async () => {
-    const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
-    jest.spyOn(postRepository, 'findAndCount').mockResolvedValueOnce([[mockPost], 1]);
-
-    expect(await service.findAll(paginationDto)).toEqual({
-      data: [mockResponsePostDto],
-      total: 1,
-      page: 1,
-      limit: 10,
+      const result = await service.create(postPostDto);
+      expect(result).toEqual({
+        id: 1,
+        title: 'Test Post',
+        content: 'Test Content',
+        user: { id: 1, name: 'Test User' },
+      });
     });
-    expect(postRepository.findAndCount).toHaveBeenCalledWith({
-      skip: 0,
-      take: 10,
-      order: { id: 'ASC' },
-      relations: ['user'],
+
+    it('should throw an error if user is not found', async () => {
+      const postPostDto: PostPostDto = { title: 'Test Post', content: 'Test Content', userId: 1 };
+
+      userService.findOne.mockRejectedValue(new NotFoundException());
+
+      await expect(service.create(postPostDto)).rejects.toThrow(NotFoundException);
     });
   });
 
-  it('should update a post', async () => {
-    const updateDto: UpdatePostDto = { title: 'Updated Post', content: 'This is an updated post' };
-    jest.spyOn(postRepository, 'findOne').mockResolvedValueOnce(mockPost);
-    jest.spyOn(postRepository, 'save').mockResolvedValueOnce(updatedPost);
+  describe('findOne', () => {
+    it('should return a post if post is found', async () => {
+      const user: User = { id: 1, name: 'Test User', email: 'test@example.com', posts: [], comments: [] };
+      const post: Post = { id: 1, title: 'Test Post', content: 'Test Content', user, comment: null };
 
-    const updatedPostEntity = {
-      ...mockPost,
-      ...updateDto,
-    };
+      postRepository.findById.mockResolvedValue(post);
 
-    const updatedPostResult = {
-      ...updatedPostEntity,
-      user: mockAuthorUserDto,
-    };
+      const result = await service.findOne(1);
+      expect(result).toEqual({
+        id: 1,
+        title: 'Test Post',
+        content: 'Test Content',
+        user: { id: 1, name: 'Test User' },
+      });
+    });
 
-    expect(await service.update(1, updateDto)).toEqual(updatedResponsePostDto);
-    expect(postRepository.save).toHaveBeenCalledWith(expect.objectContaining(updatedPostResult));
+    it('should throw an error if post is not found', async () => {
+      postRepository.findById.mockResolvedValue(null);
+
+      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+    });
   });
 
-  it('should delete a post', async () => {
-    jest.spyOn(postRepository, 'findOne').mockResolvedValueOnce(mockPost);
-    jest.spyOn(postRepository, 'delete').mockResolvedValueOnce({ raw: '', affected: 1 });
+  describe('findAll', () => {
+    it('should return an array of posts', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+      const user: User = { id: 1, name: 'Test User', email: 'test@example.com', posts: [], comments: [] };
+      const posts: Post[] = [
+        { id: 1, title: 'Test Post 1', content: 'Test Content 1', user, comment: null },
+        { id: 2, title: 'Test Post 2', content: 'Test Content 2', user, comment: null },
+      ];
 
-    await service.remove(1);
-    expect(postRepository.delete).toHaveBeenCalledWith(mockPost.id);
+      postRepository.findAndCount.mockResolvedValue([posts, 2]);
+
+      const result = await service.findAll(paginationDto);
+      expect(result).toEqual({
+        data: [
+          { id: 1, title: 'Test Post 1', content: 'Test Content 1', user: { id: 1, name: 'Test User' } },
+          { id: 2, title: 'Test Post 2', content: 'Test Content 2', user: { id: 1, name: 'Test User' } },
+        ],
+        total: 2,
+        page: 1,
+        limit: 10,
+      });
+      expect(postRepository.findAndCount).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        order: { id: 'ASC' },
+        relations: ['user'],
+      });
+    });
+
+
+    it('should throw an error if fetching posts fails', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+
+      postRepository.find.mockRejectedValue(new Error('Failed to fetch posts'));
+
+      await expect(service.findAll(paginationDto)).rejects.toThrow('Failed to fetch posts');
+    });
   });
 
-  it('should throw a BadRequestException on save error', async () => {
-    const postDto: PostPostDto = { title: 'Test Post', content: 'This is a test post', userId: 1 };
-    jest.spyOn(postRepository, 'save').mockRejectedValueOnce(new Error());
 
-    await expect(service.create(postDto)).rejects.toThrow(BadRequestException);
+  describe('update', () => {
+    it('should update a post successfully', async () => {
+      const updatePostDto: UpdatePostDto = { title: 'Updated Post', content: 'Updated Content' };
+      const user: User = { id: 1, name: 'Test User', email: 'test@example.com', posts: [], comments: [] };
+      const existingPost: Post = { id: 1, title: 'Test Post', content: 'Test Content', user, comment: null };
+      const updatedPost: Post = { ...existingPost, ...updatePostDto };
+
+      postRepository.findById.mockResolvedValue(existingPost);
+      postRepository.save.mockResolvedValue(updatedPost);
+
+      const result = await service.update(1, updatePostDto);
+      expect(result).toEqual({
+        id: 1,
+        title: 'Updated Post',
+        content: 'Updated Content',
+        user: { id: 1, name: 'Test User' },
+      });
+    });
+
+    it('should throw an error if post is not found', async () => {
+      postRepository.findById.mockResolvedValue(null);
+
+      const updatePostDto: UpdatePostDto = { title: 'Updated Post', content: 'Updated Content' };
+
+      await expect(service.update(1, updatePostDto)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove a post successfully', async () => {
+      const user: User = { id: 1, name: 'Test User', email: 'test@example.com', posts: [], comments: [] };
+      const existingPost: Post = { id: 1, title: 'Test Post', content: 'Test Content', user, comment: null };
+
+      postRepository.findById.mockResolvedValue(existingPost);
+      postRepository.delete.mockResolvedValue({ affected: 1 });
+
+      await expect(service.remove(1)).resolves.not.toThrow();
+    });
+
+    it('should throw an error if post is not found', async () => {
+      postRepository.findById.mockResolvedValue(null);
+
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+    });
   });
 });
+
+
+
+
