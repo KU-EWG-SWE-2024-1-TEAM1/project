@@ -8,8 +8,8 @@ import { getTypeOrmConfig } from './config/dbconfig';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import { PostModule } from "./modules/post/module";
-import { ConnectModule } from "./connect.module";
 import { MovieModule } from "./modules/movie/module";
+import {ConnectionModule} from "./modules/connection/module";
 
 const ENV = process.env.NODE_ENV || 'dev';
 const configFilePath = `config/${ENV}.yaml`;
@@ -26,7 +26,7 @@ const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
       useFactory: async (configService: ConfigService) => getTypeOrmConfig(configService),
       inject: [ConfigService],
     }),
-    ConnectModule, UserModule,PostModule,MovieModule
+    ConnectionModule, UserModule,PostModule,MovieModule
   ],
 })
 export class AppModule {}

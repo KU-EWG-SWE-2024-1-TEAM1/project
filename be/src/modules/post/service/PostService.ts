@@ -8,29 +8,25 @@ import { PaginationDto } from '../../../utils/pagination/paginationDto';
 import { User } from '../../user/entity/User';
 import { mapToDto } from '../../../utils/mapper/mapper';
 import { AuthorUserDto } from '../../user/dto/UserDto';
+import { UserService } from "../../user/service/UserService";
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,  // UserService 주입
   ) {}
 
   async create(postPostDto: PostPostDto): Promise<ResponsePostDto> {
-    const userId = parseInt(postPostDto.userId.toString(), 10);
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
+    const user = await this.userService.findOne(postPostDto.userId);
 
     const post = this.postRepository.create({
       ...postPostDto,
       user,
     });
 
-    const savedPost = await this.checkError(() => this.postRepository.save(post), 'Failed to create post');
+    const savedPost = await this.handleErrors(() => this.postRepository.save(post), 'Failed to create post');
     return this.toResponsePostDto(savedPost);
   }
 
@@ -58,26 +54,18 @@ export class PostService {
   async update(id: number, updatePostDto: UpdatePostDto): Promise<ResponsePostDto> {
     const post = await this.findOne(id);
     Object.assign(post, updatePostDto);
-    const updatedPost = await this.checkError(() => this.postRepository.save(post), 'Failed to update post');
+    const updatedPost = await this.handleErrors(() => this.postRepository.save(post), 'Failed to update post');
     return this.toResponsePostDto(updatedPost);
   }
 
   async remove(id: number): Promise<void> {
     const post = await this.findOne(id);
-    await this.checkError(() => this.postRepository.delete(post.id), 'Failed to delete post');
+    await this.handleErrors(() => this.postRepository.delete(post.id), 'Failed to delete post');
   }
 
   private ensureExists(post: Post, id: number): void {
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
-    }
-  }
-
-  private async checkError<T>(operation: () => Promise<T>, errorMessage: string): Promise<T> {
-    try {
-      return await operation();
-    } catch (error) {
-      throw new BadRequestException(errorMessage);
     }
   }
 
