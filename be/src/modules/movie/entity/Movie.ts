@@ -22,6 +22,5 @@ export class Movie {
 
   @Column({ default: 0 })
   searchCount: number;
-  // @OneToMany(() => Rating, rating => rating.movie)
-  // ratings: Rating[];
+
 }

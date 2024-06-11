@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from '../entity/User';
 import { PostUserDto, UpdateUserDto, ResponseUserDto,} from '../dto/UserDto';
+import { UserRepository } from "../repository/UserRepository";
 
 @Injectable()
 export class UserService {
     constructor(
-      @InjectRepository(User)
-      private readonly userRepository: Repository<User>,
+      @InjectRepository(UserRepository)
+      private readonly userRepository: UserRepository,
     ) {}
 
     async create(postUserDto: PostUserDto): Promise<ResponseUserDto> {
@@ -19,7 +19,7 @@ export class UserService {
     }
 
     async findOne(id: number): Promise<ResponseUserDto> {
-        const user = await this.userRepository.findOne({ where: { id } });
+        const user = await this.userRepository.findById(id);
         this.ensureExists(user, id);
         return this.toResponseUserDto(user);
     }

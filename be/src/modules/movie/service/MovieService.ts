@@ -41,7 +41,7 @@ export class MovieService {
   }
 
   async update(id: number, updateMovieDto: UpdateMovieDto): Promise<ResponseMovieDto> {
-    const movie = await this.movieRepository.findOne({ where: { id } });
+    const movie = await this.movieRepository.findById(id);
     this.ensureExists(movie, id);
     Object.assign(movie, updateMovieDto);
     const updatedMovie = await this.checkError(() => this.movieRepository.save(movie), 'Failed to update movie');
