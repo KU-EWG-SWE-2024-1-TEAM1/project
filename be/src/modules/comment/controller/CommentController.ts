@@ -18,7 +18,7 @@ export class CommentController {
     return this.commentService.findById(id);
   }
   @Get('post/:postId')
-  async findByPostId(@Param('postId', ParseIntPipe) postId: number): Promise<ResponseCommentDto> {
+  async findByPostId(@Param('postId', ParseIntPipe) postId: number): Promise<ResponseCommentDto[]> {
     return this.commentService.findByPostId(postId);
   }
 

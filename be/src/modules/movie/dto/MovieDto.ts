@@ -35,6 +35,5 @@ export class ResponseMovieDto {
   title: string;
   description: string;
   releaseDate: Date;
-  averageScore: number;
   searchCount: number;
 }

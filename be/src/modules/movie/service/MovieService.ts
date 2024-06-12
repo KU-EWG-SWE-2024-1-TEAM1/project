@@ -83,7 +83,6 @@ export class MovieService {
       description: movie.description,
       releaseDate: movie.releaseDate,
       searchCount: movie.searchCount,
-      averageScore: movie.ratingCount ? movie.totalScore / movie.ratingCount : 0,
     };
   }
 }

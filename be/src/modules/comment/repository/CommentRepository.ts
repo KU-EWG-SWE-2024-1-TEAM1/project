@@ -8,8 +8,8 @@ export class CommentRepository extends Repository<Comment> {
     super(Comment, dataSource.createEntityManager());
   }
 
-  async findByPostId(postId: number): Promise<Comment| undefined> {
-    return this.findOne({
+  async findByPostId(postId: number):  Promise<Comment[]>{
+    return this.find({
       where: { post: { id: postId } },
       relations: ['user', 'post'],
     });

@@ -99,20 +99,17 @@ describe('CommentService', () => {
   });
 
   describe('findByPostId', () => {
-    it('should return a comment', async () => {
-      const user = { id: 1 } as User;
-      const post = { id: 1 } as Post;
-      const comment = { id: 1, user, post, rating: 5, comment: 'Great post!' } as Comment;
-      jest.spyOn(commentRepository, 'findByPostId').mockResolvedValue(comment);
+    it('should return an array of comments', async () => {
+      const user = { id: 1, name: 'User1', email: 'user1@example.com' } as User;
+      const post = { id: 1, title: 'Post1', content: 'Content1' } as Post;
+      const comments = [
+        { id: 1, user, post, rating: 5, comment: 'Great post!' } as Comment,
+        { id: 2, user, post, rating: 4, comment: 'Nice post!' } as Comment,
+      ];
+      jest.spyOn(commentRepository, 'findByPostId').mockResolvedValue(comments);
 
-      const result = await service.findByPostId(1);
-      expect(result).toEqual(service.toResponseCommentDto(comment));
-    });
-
-    it('should throw NotFoundException if comment not found', async () => {
-      jest.spyOn(commentRepository, 'findByPostId').mockResolvedValue(undefined);
-
-      await expect(service.findByPostId(1)).rejects.toThrow(NotFoundException);
+      const result = await service.findByPostId(post.id);
+      expect(result).toEqual(comments.map(comment => service.toResponseCommentDto(comment)));
     });
   });
 

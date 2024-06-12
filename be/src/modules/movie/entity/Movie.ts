@@ -15,12 +15,6 @@ export class Movie {
   releaseDate: Date;
 
   @Column({ default: 0 })
-  totalScore: number;
-
-  @Column({ default: 0 })
-  ratingCount: number;
-
-  @Column({ default: 0 })
   searchCount: number;
 
 }

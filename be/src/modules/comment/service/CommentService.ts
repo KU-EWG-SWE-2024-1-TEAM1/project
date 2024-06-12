@@ -44,10 +44,9 @@ export class CommentService {
     return this.toResponseCommentDto(comment);
   }
 
-  async findByPostId(postId: number): Promise<ResponseCommentDto> {
-    const comment = await this.commentRepository.findByPostId(postId)
-    this.checkCommentExists(comment, postId);
-    return this.toResponseCommentDto(comment);
+  async findByPostId(postId: number): Promise<ResponseCommentDto[]> {
+    const comments = await this.commentRepository.findByPostId(postId);
+    return comments.map(comment => this.toResponseCommentDto(comment));
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto): Promise<ResponseCommentDto> {
