@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert } from 
 import { Post } from "../../post/entity/Post";
 import { Comment } from '../../comment/entity/Comment';
 import * as bcrypt from 'bcrypt';
+import { Role } from "../../../auth/authorization/Role";
 
 @Entity()
 export class User {
@@ -27,6 +28,9 @@ export class User {
             this.password = await bcrypt.hash(this.password, this.salt);
         }
     }
+
+    @Column({ type: 'varchar', length: 5, default: Role.User })
+    role: Role;
 
     @OneToMany(() => Post, post => post.user)
     posts: Post[];

@@ -25,13 +25,17 @@ const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+
       useFactory: async (configService: ConfigService) => ({
         ...getTypeOrmConfig(configService),
         autoLoadEntities: true,
-      }),      inject: [ConfigService],
+      }),
+
+      inject: [ConfigService],
 
     }),
     ConnectionModule,UserModule,PostModule,MovieModule,CommentModule,AuthModule
   ],
+
 })
 export class AppModule {}
