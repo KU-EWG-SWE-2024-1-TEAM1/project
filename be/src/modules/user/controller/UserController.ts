@@ -1,18 +1,36 @@
-import { Controller, Get, Post, Body, Param, Delete, UsePipes, ValidationPipe, Patch, ParseIntPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Param,
+    Delete,
+    UsePipes,
+    ValidationPipe,
+    Patch,
+    ParseIntPipe,
+    UseGuards
+} from "@nestjs/common";
 import { UserService } from '../service/UserService';
 import { PostUserDto, UpdateUserDto, ResponseUserDto } from '../dto/UserDto';
+import { AuthGuard } from "../../../auth/JwtAuthGuard/JwtAuthGuard";
+import { Role } from "../../../auth/authorization/Role";
+import { Roles } from "../../../auth/authorization/decorator";
+import { RolesGuard } from "../../../auth/authorization/RolesGuard";
 
 @Controller('api/users')
+@UsePipes(new ValidationPipe())
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.Admin)
     async findAll(): Promise<ResponseUserDto[]> {
         return this.userService.findAll();
     }
 
     @Post()
-    @UsePipes(new ValidationPipe())
     async create(@Body() postUserDto: PostUserDto): Promise<ResponseUserDto> {
         return this.userService.create(postUserDto);
     }

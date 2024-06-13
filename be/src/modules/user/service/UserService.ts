@@ -24,6 +24,11 @@ export class UserService {
         return this.toResponseUserDto(user);
     }
 
+    async findByEmail(email: string): Promise<User> {
+        const user = await this.userRepository.findByEmail(email);
+        return user;
+    }
+
     async findAll(): Promise<ResponseUserDto[]> {
         const users = await this.checkError(() => this.userRepository.find(), 'Failed to fetch users');
         return users.map(user => this.toResponseUserDto(user));
