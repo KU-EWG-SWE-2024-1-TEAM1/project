@@ -17,8 +17,6 @@ export class RolesGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const user = request['user'];
-    console.log('Request context in RolesGuard:', request); // 디버깅 로그 추가
-    console.log('User in RolesGuard:', user); // 디버깅 로그 추가
     if (!user) {
       throw new UnauthorizedException('User not found in request');
     }

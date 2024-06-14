@@ -1,18 +1,19 @@
 import {
-    Controller,
-    Get,
-    Post,
     Body,
-    Param,
+    Controller,
     Delete,
-    UsePipes,
-    ValidationPipe,
-    Patch,
+    Get,
+    Param,
     ParseIntPipe,
-    UseGuards
+    Patch,
+    Post,
+    Request,
+    UseGuards,
+    UsePipes,
+    ValidationPipe
 } from "@nestjs/common";
-import { UserService } from '../service/UserService';
-import { PostUserDto, UpdateUserDto, ResponseUserDto } from '../dto/UserDto';
+import { UserService } from "../service/UserService";
+import { PostUserDto, ResponseUserDto, UpdateUserDto } from "../dto/UserDto";
 import { AuthGuard } from "../../../auth/JwtAuthGuard/JwtAuthGuard";
 import { Role } from "../../../auth/authorization/Role";
 import { Roles } from "../../../auth/authorization/decorator";
@@ -23,7 +24,7 @@ import { RolesGuard } from "../../../auth/authorization/RolesGuard";
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get()
+    @Get('all')
     @UseGuards(AuthGuard,RolesGuard)
     @Roles(Role.Admin)
     async findAll(): Promise<ResponseUserDto[]> {
@@ -35,17 +36,37 @@ export class UserController {
         return this.userService.create(postUserDto);
     }
 
+    @Get()
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.Admin,Role.User)
+    async findMe(@Request() request:any): Promise<ResponseUserDto> {
+        return this.userService.findMe(request.user.id);
+    }
+
     @Get(':id')
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.Admin)
     async findOne(@Param('id', ParseIntPipe) id: number): Promise<ResponseUserDto> {
         return this.userService.findOne(id);
     }
 
+    @Patch()
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.User)
+    async updateMe(@Request() request:any, @Body() updateUserDto: UpdateUserDto): Promise<ResponseUserDto> {
+        return this.userService.update(request.user.id, updateUserDto);
+    }
+
     @Patch(':id')
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.Admin)
     async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<ResponseUserDto> {
         return this.userService.update(id, updateUserDto);
     }
 
     @Delete(':id')
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.Admin)
     async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.userService.remove(id);
     }

@@ -5,6 +5,7 @@ import { Movie } from '../entity/Movie';
 import { PostMovieDto, UpdateMovieDto, ResponseMovieDto } from '../dto/MovieDto';
 import { paginate, PaginationResult } from "../../../utils/pagination/pagination";
 import { PaginationDto } from "../../../utils/pagination/paginationDto";
+import { mapToDto } from "../../../utils/mapper/Mapper";
 
 @Injectable()
 export class MovieService {
@@ -16,13 +17,18 @@ export class MovieService {
   async create(postMovieDto: PostMovieDto): Promise<ResponseMovieDto> {
     const movie = this.movieRepository.create(postMovieDto);
     const savedMovie = await this.checkError(() => this.movieRepository.save(movie), 'Failed to create movie');
-    return this.toResponseMovieDto(savedMovie);
+    return mapToDto(savedMovie,ResponseMovieDto);
   }
 
   async findOne(id: number): Promise<ResponseMovieDto> {
-    const movie = await this.movieRepository.findOne({ where: { id } });
+    const movie = await this.movieRepository.findById(id);
     this.ensureExists(movie, id);
-    return this.toResponseMovieDto(movie);
+    return mapToDto(movie,ResponseMovieDto);
+  }
+  async findById(id: number): Promise<Movie> {
+    const movie = await this.movieRepository.findById(id);
+    this.ensureExists(movie, id);
+    return movie;
   }
 
   async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ResponseMovieDto>> {
@@ -33,7 +39,7 @@ export class MovieService {
     );
 
     return {
-      data: result.data.map(movie => this.toResponseMovieDto(movie)),
+      data: result.data.map(movie => mapToDto(movie,ResponseMovieDto)),
       total: result.total,
       page,
       limit,
@@ -45,7 +51,7 @@ export class MovieService {
     this.ensureExists(movie, id);
     Object.assign(movie, updateMovieDto);
     const updatedMovie = await this.checkError(() => this.movieRepository.save(movie), 'Failed to update movie');
-    return this.toResponseMovieDto(updatedMovie);
+    return mapToDto(updatedMovie,ResponseMovieDto);
   }
 
   async remove(id: number): Promise<void> {
@@ -74,15 +80,5 @@ export class MovieService {
     } catch (error) {
       throw new BadRequestException(errorMessage);
     }
-  }
-
-  private toResponseMovieDto(movie: Movie): ResponseMovieDto {
-    return {
-      id: movie.id,
-      title: movie.title,
-      description: movie.description,
-      releaseDate: movie.releaseDate,
-      searchCount: movie.searchCount,
-    };
   }
 }
