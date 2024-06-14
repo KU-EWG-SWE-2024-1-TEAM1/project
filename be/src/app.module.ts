@@ -3,15 +3,16 @@ dotenv.config();
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from './modules/user/module';
 import { getTypeOrmConfig } from './config/dbconfig';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
+import {ConnectionModule} from "./modules/connection/module";
+import { AuthModule } from "./auth/module";
+import { DataModule } from "./modules/data/module";
+import { UserModule } from "./modules/user/module";
 import { PostModule } from "./modules/post/module";
 import { MovieModule } from "./modules/movie/module";
-import {ConnectionModule} from "./modules/connection/module";
 import { CommentModule } from "./modules/comment/module";
-import { AuthModule } from "./auth/module";
 
 const ENV = process.env.NODE_ENV || 'dev';
 const configFilePath = `config/${ENV}.yaml`;
@@ -34,7 +35,8 @@ const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
       inject: [ConfigService],
 
     }),
-    ConnectionModule,UserModule,PostModule,MovieModule,CommentModule,AuthModule
+    ConnectionModule,DataModule,AuthModule,
+    UserModule,PostModule,MovieModule,CommentModule
   ],
 
 })

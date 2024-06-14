@@ -1,20 +1,30 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn ,BaseEntity, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import { Post } from "../../post/entity/Post";
 
 @Entity()
-export class Movie {
+export class Movie extends BaseEntity{
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   title: string;
 
-  @Column('text')
+  @Column()
   description: string;
 
   @Column()
-  releaseDate: Date;
+  bigImgUrl: string;
 
-  @Column({ default: 0 })
-  searchCount: number;
+  @Column()
+  thumbNailUrl: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => Post, post => post.movie)
+  posts: Post[]
 
 }

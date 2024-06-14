@@ -8,7 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   UsePipes,
-  ValidationPipe, UseGuards
+  ValidationPipe, UseGuards, Request
 } from "@nestjs/common";
 import { CommentService } from '../service/CommentService';
 import { PostCommentDto } from '../dto/CommentDto';
@@ -26,22 +26,30 @@ export class CommentController {
 
   @Post()
   @UseGuards(AuthGuard,RolesGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
   @Roles(Role.User)
-  async create(@Body() createCommentDto: PostCommentDto): Promise<ResponseCommentDto> {
-    return this.commentService.create(createCommentDto);
+  async create(@Body() createCommentDto: PostCommentDto, @Request() request: any): Promise<ResponseCommentDto> {
+    return this.commentService.create(createCommentDto,request.user.id);
   }
 
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number): Promise<ResponseCommentDto> {
     return this.commentService.findById(id);
   }
+
   @Get('post/:postId')
   async findByPostId(@Param('postId', ParseIntPipe) postId: number): Promise<ResponseCommentDto[]> {
     return this.commentService.findByPostId(postId);
   }
 
+  @Get('user')
+  async findByUser(@Request() request: any): Promise<ResponseCommentDto[]> {
+    return this.commentService.findByUserId(request.user.id);
+  }
+
   @Patch(':id')
   @UseGuards(AuthGuard,RolesGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
   @Roles(Role.User)
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateCommentDto: UpdateCommentDto): Promise<ResponseCommentDto> {
     return this.commentService.update(id, updateCommentDto);

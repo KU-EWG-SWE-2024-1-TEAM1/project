@@ -10,7 +10,8 @@ import {
   ValidationPipe,
   ParseIntPipe,
   Query,
-  UseGuards
+  UseGuards,
+  Request
 } from "@nestjs/common";
 import { PostService } from '../service/PostService';
 import { PostPostDto, ResponsePostDto, UpdatePostDto } from '../dto/PostDto';
@@ -28,16 +29,17 @@ export class PostController {
 
   @Get()
   @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin,Role.User)
   async findAll(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ResponsePostDto>> {
     return this.postService.findAll(paginationDto);
   }
 
   @Post()
   @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.User)
-  async create(@Body() postDto: PostPostDto): Promise<ResponsePostDto> {
-    return this.postService.create(postDto);
+  @Roles(Role.Admin,Role.User)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async create(@Body() postPostDto: PostPostDto, @Request() request: any): Promise<any> {
+    return this.postService.create(postPostDto, request.user.id);
   }
 
   @Get(':id')
@@ -47,14 +49,14 @@ export class PostController {
 
   @Patch(':id')
   @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.User)
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updatePostDto: UpdatePostDto): Promise<ResponsePostDto> {
-    return this.postService.update(id, updatePostDto);
+  @Roles(Role.Admin,Role.User)
+  async update(@Param('id', ParseIntPipe) id: number,@Body() updatePostDto: UpdatePostDto,@Request() request: any): Promise<ResponsePostDto> {
+    return this.postService.update(id, updatePostDto, request.user);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.User)
+  @Roles(Role.Admin,Role.User)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.postService.remove(id);
   }
