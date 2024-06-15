@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UsePipes,
-  ValidationPipe,
-  ParseIntPipe,
-  Query, UseGuards
-} from "@nestjs/common";
+import {Controller,Get,Post,Patch,Delete,Param,Body,UsePipes,ValidationPipe,ParseIntPipe,Query, UseGuards} from "@nestjs/common";
 import { MovieService } from '../service/MovieService';
 import { PostMovieDto, UpdateMovieDto, ResponseMovieDto } from '../dto/MovieDto';
 import { PaginationDto } from "../../../utils/pagination/paginationDto";

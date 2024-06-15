@@ -31,7 +31,9 @@ export class UserService {
         return mapToDto(user,ResponseUserDto);
     }
     async findById(id: number): Promise<User> {
-        return await this.userRepository.findById(id);
+       const user = await this.userRepository.findById(id);
+       this.ensureExists(user,id);
+       return user;
     }
 
     async findByEmail(email: string): Promise<User> {

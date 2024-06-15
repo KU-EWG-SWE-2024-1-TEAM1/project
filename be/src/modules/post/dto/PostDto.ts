@@ -13,10 +13,6 @@ export class PostPostDto {
 
   @Type(() => Number)
   @IsInt()
-  userId: number;
-
-  @Type(() => Number)
-  @IsInt()
   movieId: number;
 }
 

@@ -1,8 +1,8 @@
 import { IsInt, IsString, IsNotEmpty, IsOptional, Min, Max } from "class-validator";
 import { Type } from "class-transformer";
 import { Field } from "../../../utils/mapper/FieldNameExtractor";
-import { AuthorUserDto, ResponseUserDto } from "../../user/dto/UserDto";
-import { ResponsePostDto, ShortPostDto } from "../../post/dto/PostDto";
+import { AuthorUserDto } from "../../user/dto/UserDto";
+import {  ShortPostDto } from "../../post/dto/PostDto";
 
 export class PostCommentDto {
   @IsNotEmpty()
