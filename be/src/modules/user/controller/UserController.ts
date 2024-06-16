@@ -40,7 +40,7 @@ export class UserController {
     @UseGuards(AuthGuard,RolesGuard)
     @Roles(Role.Admin,Role.User)
     async findMe(@Request() request:any): Promise<ResponseUserDto> {
-        return this.userService.findMe(request.user.id);
+        return this.userService.findMe(request.user.email);
     }
 
     @Get(':id')
