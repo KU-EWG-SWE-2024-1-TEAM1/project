@@ -25,9 +25,9 @@ export class UserService {
         return mapToDto(user,ResponseUserDto);
     }
 
-    async findMe(id: number): Promise<ResponseUserDto> {
-        const user = await this.userRepository.findById(id);
-        this.ensureExists(user, id);
+    async findMe(email: string): Promise<ResponseUserDto> {
+        const user = await this.userRepository.findByEmail(email);
+        this.ensureExists(user, 0);
         return mapToDto(user,ResponseUserDto);
     }
     async findById(id: number): Promise<User> {
@@ -63,7 +63,7 @@ export class UserService {
         }
     }
 
-    private async ensureEmailNotExists(email: string): Promise<void> {
+    async ensureEmailNotExists(email: string): Promise<void> {
         const user = await this.userRepository.findOne({ where: { email } });
         if (user) {
             throw new BadRequestException(`Email ${email} already exists`);
