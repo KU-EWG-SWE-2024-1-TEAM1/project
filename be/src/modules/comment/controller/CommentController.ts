@@ -27,9 +27,9 @@ export class CommentController {
   @Post()
   @UseGuards(AuthGuard,RolesGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Roles(Role.User)
-  async create(@Body() createCommentDto: PostCommentDto, @Request() request: any): Promise<ResponseCommentDto> {
-    return this.commentService.create(createCommentDto,request.user.id);
+  @Roles(Role.User,Role.Admin)
+  async create(@Body() postCommentDto: PostCommentDto, @Request() request: any): Promise<ResponseCommentDto> {
+    return this.commentService.create(postCommentDto,request.user.email);
   }
 
   @Get(':id')
@@ -50,14 +50,14 @@ export class CommentController {
   @Patch(':id')
   @UseGuards(AuthGuard,RolesGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Roles(Role.User)
+  @Roles(Role.User,Role.Admin)
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateCommentDto: UpdateCommentDto): Promise<ResponseCommentDto> {
     return this.commentService.update(id, updateCommentDto);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.User)
+  @Roles(Role.User,Role.Admin)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commentService.remove(id);
   }
