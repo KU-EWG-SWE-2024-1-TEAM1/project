@@ -5,15 +5,11 @@ import { AuthorUserDto } from "../../user/dto/UserDto";
 import {  ShortPostDto } from "../../post/dto/PostDto";
 
 export class PostCommentDto {
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsInt()
-  user_id: number;
 
   @IsNotEmpty()
   @Type(() => Number)
   @IsInt()
-  post_id: number;
+  postId: number;
 
   @IsNotEmpty()
   @Type(() => Number)
