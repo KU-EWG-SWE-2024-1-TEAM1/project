@@ -1,4 +1,13 @@
-import { Entity,PrimaryGeneratedColumn,Column,ManyToOne,OneToOne,JoinColumn,BaseEntity,CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  BaseEntity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany
+} from "typeorm";
 import { User } from '../../user/entity/User';
 import { Comment } from '../../comment/entity/Comment';
 import { Movie } from "../../movie/entity/Movie";
@@ -17,6 +26,9 @@ export class Post extends BaseEntity{
   @Column({ default: 0 })
   score: number;
 
+  @Column({ default: 0 })
+  view: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -26,9 +38,8 @@ export class Post extends BaseEntity{
   @ManyToOne(() => User, user => user.posts)
   user: User;
 
-  @OneToOne(() => Comment, comment => comment.post)
-  @JoinColumn()
-  comment: Comment;
+  @OneToMany(() => Comment, comment => comment.post)
+  comments: Comment[];
 
   @ManyToOne(() => Movie, movie => movie.posts)
   movie: Movie;
