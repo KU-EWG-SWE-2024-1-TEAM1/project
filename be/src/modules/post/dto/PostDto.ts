@@ -49,6 +49,9 @@ export class ResponsePostDto {
   @Field
   updatedAt: Date;
 
+  @Field
+  score: number;
+
 }
 
 export class ShortPostDto{
