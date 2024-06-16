@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from '../entity/Comment';
 import { PostCommentDto, UpdateCommentDto, ResponseCommentDto } from '../dto/CommentDto';
@@ -6,6 +6,8 @@ import { CommentRepository } from "../repository/CommentRepository";
 import { UserRepository } from "../../user/repository/UserRepository";
 import { PostRepository } from "../../post/repository/PostRepository";
 import { mapToDto } from "../../../utils/mapper/Mapper";
+import { User } from "../../user/entity/User";
+import { Post } from "../../post/entity/Post";
 
 
 @Injectable()
@@ -19,15 +21,14 @@ export class CommentService {
     private readonly postRepository: PostRepository,
   ) {}
 
-  async create(createCommentDto: PostCommentDto,reqUserId:number): Promise<ResponseCommentDto> {
-    const { post_id, rating, comment } = createCommentDto;
+  async create(createCommentDto: PostCommentDto,reqUserEmail:string): Promise<ResponseCommentDto> {
+    const { postId, rating, comment } = createCommentDto;
 
-    const user = await this.userRepository.findById(reqUserId);
-    const post = await this.postRepository.findById(post_id);
+    const user = await this.userRepository.findByEmail(reqUserEmail);
+    const post = await this.postRepository.findById(postId);
 
-    if (!user || !post) {
-      throw new NotFoundException('User or Post not found');
-    }
+    CommentService.ensureExists(user, post);
+    await this.ensureUnique(user.id, post.id);
 
     const newComment = this.commentRepository.create({
       rating,
@@ -36,7 +37,14 @@ export class CommentService {
       post,
     });
     await this.commentRepository.save(newComment);
+    await this.updatePostScore(postId);
     return mapToDto(newComment,ResponseCommentDto);
+  }
+
+  private static ensureExists(user: User, post: Post) {
+    if (!user || !post) {
+      throw new NotFoundException("User or Post not found");
+    }
   }
 
   async findById(id: number): Promise<ResponseCommentDto> {
@@ -60,6 +68,7 @@ export class CommentService {
     this.checkCommentExists(comment, id);
     Object.assign(comment, updateCommentDto);
     await this.commentRepository.save(comment);
+    await this.updatePostScore(comment.post.id);
     return  mapToDto(comment,ResponseCommentDto);
   }
 
@@ -67,6 +76,7 @@ export class CommentService {
     const comment = await this.commentRepository.findById(id);
     this.checkCommentExists(comment, id);
     await this.commentRepository.remove(comment);
+    await this.updatePostScore(comment.post.id);
   }
 
 
@@ -75,4 +85,24 @@ export class CommentService {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
   }
+
+  private async ensureUnique(userId: number, postId: number): Promise<void> {
+    const existingComment = await this.commentRepository.findOne({ where: { user: { id: userId }, post: { id: postId } } });
+    if (existingComment) {
+      throw new ConflictException('User has already commented on this post');
+    }
+  }
+
+  async updatePostScore(postId: number): Promise<void> {
+    const result = await this.commentRepository
+      .createQueryBuilder('comment')
+      .select('AVG(comment.rating)', 'averageRating')
+      .where('comment.postId = :postId', { postId })
+      .getRawOne();
+
+    const averageRating = parseFloat(result.averageRating).toFixed(1);
+
+    await this.postRepository.update(postId, { score: parseFloat(averageRating) });
+  }
+
 }
