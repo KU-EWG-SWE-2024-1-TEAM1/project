@@ -3,11 +3,9 @@ import { CommentService } from "../../src/modules/comment/service/CommentService
 import { CommentRepository } from "../../src/modules/comment/repository/CommentRepository";
 import { UserRepository } from "../../src/modules/user/repository/UserRepository";
 import { PostRepository } from "../../src/modules/post/repository/PostRepository";
-import { NotFoundException } from '@nestjs/common';
-import { PostCommentDto,  UpdateCommentDto } from "../../src/modules/comment/dto/CommentDto";
-import { User } from "../../src/modules/user/entity/User";
-import { Post } from "../../src/modules/post/entity/Post";
-import { Comment } from "../../src/modules/comment/entity/Comment";
+import { ConflictException, NotFoundException } from "@nestjs/common";
+import { PostCommentDto, UpdateCommentDto } from "../../src/modules/comment/dto/CommentDto";
+
 
 const mockCommentRepository = () => ({
   create: jest.fn(),
@@ -16,34 +14,26 @@ const mockCommentRepository = () => ({
   findByPostId: jest.fn(),
   findByUserId: jest.fn(),
   remove: jest.fn(),
+  findOne: jest.fn(),
+  createQueryBuilder: jest.fn().mockReturnValue({
+    select: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    getRawOne: jest.fn().mockResolvedValue({ averageRating: '4.0' }),
+  }),
 });
 
 const mockUserRepository = () => ({
-  findById: jest.fn(),
+  findByEmail: jest.fn(),
 });
 
 const mockPostRepository = () => ({
   findById: jest.fn(),
+  update: jest.fn(),
 });
 
-const mockUser: Partial<User> = {
-  id: 1,
-};
-
-const mockPost: Partial<Post> = {
-  id: 1,
-};
-
-const mockComment: Comment = {
-  id: 1,
-  rating: 5,
-  comment: 'Test comment',
-  user: mockUser as User,
-  post: mockPost as Post,
-};
 
 describe('CommentService', () => {
-  let service: CommentService;
+  let commentService: CommentService;
   let commentRepository;
   let userRepository;
   let postRepository;
@@ -58,133 +48,169 @@ describe('CommentService', () => {
       ],
     }).compile();
 
-    service = module.get<CommentService>(CommentService);
+    commentService = module.get<CommentService>(CommentService);
     commentRepository = module.get<CommentRepository>(CommentRepository);
     userRepository = module.get<UserRepository>(UserRepository);
     postRepository = module.get<PostRepository>(PostRepository);
   });
 
   describe('create', () => {
-    it('should create a comment successfully', async () => {
+    it('should create and return a comment', async () => {
       const createCommentDto: PostCommentDto = {
-        user_id: 1,
-        post_id: 1,
-        rating: 5,
-        comment: 'Test comment',
+        postId: 1,
+        rating: 4,
+        comment: 'Great post!',
+      };
+      const reqUserEmail = 'test@example.com';
+      const user = { id: 1,email: 'test@example.com'};
+      const post = { id: 1, title: 'Test Post' };
+      const comment = { id: 1, ...createCommentDto, user, post };
+
+      userRepository.findByEmail.mockResolvedValue(user);
+      postRepository.findById.mockResolvedValue(post);
+      commentRepository.create.mockReturnValue(comment);
+      commentRepository.save.mockResolvedValue(comment);
+
+      const result = await commentService.create(createCommentDto, reqUserEmail);
+
+      const expectedResponse = {
+        id: 1,
+        user: { id: 1},
+        post: { id: 1, title: 'Test Post' },
+        rating: 4,
+        comment: 'Great post!',
       };
 
-      userRepository.findById.mockResolvedValue(mockUser as User);
-      postRepository.findById.mockResolvedValue(mockPost as Post);
-      commentRepository.create.mockReturnValue(mockComment as Comment);
-      commentRepository.save.mockResolvedValue(mockComment as Comment);
-
-      const result = await service.create(createCommentDto, 1);
-
-      expect(userRepository.findById).toHaveBeenCalledWith(1);
-      expect(postRepository.findById).toHaveBeenCalledWith(1);
+      expect(result).toEqual(expectedResponse);
       expect(commentRepository.create).toHaveBeenCalledWith({
-        rating: createCommentDto.rating,
-        comment: createCommentDto.comment,
-        user: mockUser,
-        post: mockPost,
+        rating: 4,
+        comment: 'Great post!',
+        user,
+        post,
       });
-      expect(commentRepository.save).toHaveBeenCalledWith(mockComment);
-      expect(result).toEqual(mockComment);
+      expect(commentRepository.save).toHaveBeenCalledWith(comment);
     });
 
-    it('should throw NotFoundException if user or post not found', async () => {
-      userRepository.findById.mockResolvedValue(null);
+    it('should throw a NotFoundException if user or post not found', async () => {
+      const createCommentDto: PostCommentDto = {
+        postId: 1,
+        rating: 4,
+        comment: 'Great post!',
+      };
+      const reqUserEmail = 'test@example.com';
+
+      userRepository.findByEmail.mockResolvedValue(null);
       postRepository.findById.mockResolvedValue(null);
 
-      const createCommentDto: PostCommentDto = {
-        user_id: 1,
-        post_id: 1,
-        rating: 5,
-        comment: 'Test comment',
-      };
+      await expect(commentService.create(createCommentDto, reqUserEmail)).rejects.toThrow(NotFoundException);
+    });
 
-      await expect(service.create(createCommentDto, 1)).rejects.toThrow(NotFoundException);
+    it('should throw a ConflictException if comment already exists', async () => {
+      const createCommentDto: PostCommentDto = {
+        postId: 1,
+        rating: 4,
+        comment: 'Great post!',
+      };
+      const reqUserEmail = 'test@example.com';
+      const user = { id: 1, email: reqUserEmail };
+      const post = { id: 1, title: 'Test Post' };
+
+      userRepository.findByEmail.mockResolvedValue(user);
+      postRepository.findById.mockResolvedValue(post);
+      commentRepository.findOne.mockResolvedValue({ id: 1 });
+
+      await expect(commentService.create(createCommentDto, reqUserEmail)).rejects.toThrow(ConflictException);
     });
   });
 
   describe('findById', () => {
-    it('should return a comment if found', async () => {
-      commentRepository.findById.mockResolvedValue(mockComment as Comment);
+    it('should return a comment by id', async () => {
+      const comment = {
+        id: 1,
+        rating: 4,
+        comment: 'Great post!',
+        user: { id: 1, email: 'test@example.com' },
+        post: { id: 1, title: 'Test Post' }
+      };
 
-      const result = await service.findById(1);
+      commentRepository.findById.mockResolvedValue(comment);
 
+      const result = await commentService.findById(1);
+
+      const expectedResponse = {
+        id: 1,
+        user: { id: 1},
+        post: { id: 1, title: 'Test Post' },
+        rating: 4,
+        comment: 'Great post!',
+      };
+
+      expect(result).toEqual(expectedResponse);
       expect(commentRepository.findById).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockComment);
     });
 
-    it('should throw NotFoundException if comment not found', async () => {
+    it('should throw a NotFoundException if comment not found', async () => {
       commentRepository.findById.mockResolvedValue(null);
 
-      await expect(service.findById(1)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('findByPostId', () => {
-    it('should return comments by post id', async () => {
-      commentRepository.findByPostId.mockResolvedValue([mockComment as Comment]);
-
-      const result = await service.findByPostId(1);
-
-      expect(commentRepository.findByPostId).toHaveBeenCalledWith(1);
-      expect(result).toEqual([mockComment]);
-    });
-  });
-
-  describe('findByUserId', () => {
-    it('should return comments by user id', async () => {
-      commentRepository.findByUserId.mockResolvedValue([mockComment as Comment]);
-
-      const result = await service.findByUserId(1);
-
-      expect(commentRepository.findByUserId).toHaveBeenCalledWith(1);
-      expect(result).toEqual([mockComment]);
+      await expect(commentService.findById(1)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('update', () => {
-    it('should update a comment successfully', async () => {
-      const updateCommentDto: UpdateCommentDto = { rating: 4, comment: 'Updated comment' };
-      const updatedComment = { ...mockComment, ...updateCommentDto };
+    it('should update and return a comment', async () => {
+      const updateCommentDto: UpdateCommentDto = {
+        rating: 5,
+        comment: 'Updated comment',
+      };
+      const comment = {
+        id: 1,
+        rating: 4,
+        comment: 'Great post!',
+        user: { id: 1, email: 'test@example.com' },
+        post: { id: 1, title: 'Test Post' }
+      };
 
-      commentRepository.findById.mockResolvedValue(mockComment as Comment);
-      commentRepository.save.mockResolvedValue(updatedComment as Comment);
+      commentRepository.findById.mockResolvedValue(comment);
 
-      const result = await service.update(1, updateCommentDto);
+      const updatedComment = { ...comment, ...updateCommentDto };
 
-      expect(commentRepository.findById).toHaveBeenCalledWith(1);
+      commentRepository.save.mockResolvedValue(updatedComment);
+
+      const result = await commentService.update(1, updateCommentDto);
+
+      const expectedResponse = {
+        id: 1,
+        user: { id: 1},
+        post: { id: 1, title: 'Test Post' },
+        rating: 5,
+        comment: 'Updated comment',
+      };
+
+      expect(result).toEqual(expectedResponse);
       expect(commentRepository.save).toHaveBeenCalledWith(updatedComment);
-      expect(result).toEqual(updatedComment);
     });
 
-    it('should throw NotFoundException if comment not found', async () => {
+    it('should throw a NotFoundException if comment not found', async () => {
       commentRepository.findById.mockResolvedValue(null);
 
-      const updateCommentDto: UpdateCommentDto = { rating: 4, comment: 'Updated comment' };
-
-      await expect(service.update(1, updateCommentDto)).rejects.toThrow(NotFoundException);
+      await expect(commentService.update(1, { rating: 5 })).rejects.toThrow(NotFoundException);
     });
   });
-
   describe('remove', () => {
-    it('should delete a comment successfully', async () => {
-      commentRepository.findById.mockResolvedValue(mockComment as Comment);
-      commentRepository.remove.mockResolvedValue(null);
+    it('should remove a comment', async () => {
+      const comment = { id: 1, rating: 4, comment: 'Great post!', post: { id: 1 } };
 
-      await service.remove(1);
+      commentRepository.findById.mockResolvedValue(comment);
 
-      expect(commentRepository.findById).toHaveBeenCalledWith(1);
-      expect(commentRepository.remove).toHaveBeenCalledWith(mockComment);
+      await commentService.remove(1);
+
+      expect(commentRepository.remove).toHaveBeenCalledWith(comment);
     });
 
-    it('should throw NotFoundException if comment not found', async () => {
+    it('should throw a NotFoundException if comment not found', async () => {
       commentRepository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+      await expect(commentService.remove(1)).rejects.toThrow(NotFoundException);
     });
   });
 });
