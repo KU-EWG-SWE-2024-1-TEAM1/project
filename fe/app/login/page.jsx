@@ -8,6 +8,7 @@ import React, { useState } from "react";
 
 const LogIn = () => {
   const [inputs, setInputs] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,6 +19,18 @@ const LogIn = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+
+    const emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailFormat.test(inputs.email)) {
+      setErrorMessage("이메일 형식이 올바르지 않습니다.");
+      return;
+    }
+    if (inputs.password.length < 8) {
+      setErrorMessage("비밀번호는 8글자 이상이어야 합니다.");
+      return;
+    }
+    setErrorMessage("");
+
     console.log(inputs);
   };
 
@@ -43,7 +56,14 @@ const LogIn = () => {
             value={inputs.password}
             onChange={handleChange}
           />
-          <Button type="submit">LOGIN</Button>
+          {errorMessage && (
+            <span className="flex justify-center text-sm text-red-500">
+              {errorMessage}
+            </span>
+          )}
+          <Button type="submit" disabled={!inputs.email || !inputs.password}>
+            LOGIN
+          </Button>
         </form>
 
         <Link

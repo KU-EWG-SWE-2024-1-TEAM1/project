@@ -8,12 +8,13 @@ import React, { useState } from "react";
 
 const SignUp = () => {
   const [inputs, setInputs] = useState({
-    fullName: "",
+    name: "",
     email: "",
-    nickName: "",
+    nickname: "",
     password: "",
     confirmPassword: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,8 +23,40 @@ const SignUp = () => {
     setInputs(newInputs);
   };
 
+  const validateForm = () => {
+    if (inputs.name < 2) {
+      setErrorMessage("이름은 2글자 이상이어야 합니다.");
+      return false;
+    }
+    const emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailFormat.test(inputs.email)) {
+      setErrorMessage("이메일 형식이 올바르지 않습니다.");
+      return false;
+    }
+    if (inputs.nickname < 2) {
+      setErrorMessage("닉네임은 2글자 이상이어야 합니다.");
+      return false;
+    }
+    if (inputs.password < 8) {
+      setErrorMessage("비밀번호는 8글자 이상이어야 합니다.");
+      return false;
+    }
+    if (inputs.password !== inputs.confirmPassword) {
+      setErrorMessage("비밀번호가 일치하지 않습니다.");
+      return false;
+    }
+
+    setErrorMessage("");
+    return true;
+  };
+
   const handleSignUp = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     console.log(inputs);
   };
 
@@ -36,9 +69,9 @@ const SignUp = () => {
           <InputForm
             label="NAME"
             type="text"
-            name="fullName"
-            placeholder="fullname"
-            value={inputs.fullName}
+            name="name"
+            placeholder="name"
+            value={inputs.name}
             onChange={handleChange}
           />
           <InputForm
@@ -52,9 +85,9 @@ const SignUp = () => {
           <InputForm
             label="NICKNAME"
             type="text"
-            name="nickName"
+            name="nickname"
             placeholder="nickname"
-            value={inputs.nickName}
+            value={inputs.nickname}
             onChange={handleChange}
           />
           <InputForm
@@ -73,7 +106,23 @@ const SignUp = () => {
             value={inputs.confirmPassword}
             onChange={handleChange}
           />
-          <Button type="submit">SIGN UP</Button>
+          {errorMessage && (
+            <span className="flex justify-center text-sm text-red-500">
+              {errorMessage}
+            </span>
+          )}
+          <Button
+            type="submit"
+            disabled={
+              !inputs.name ||
+              !inputs.email ||
+              !inputs.nickname ||
+              !inputs.password ||
+              !inputs.confirmPassword
+            }
+          >
+            SIGN UP
+          </Button>
         </form>
 
         <Link
