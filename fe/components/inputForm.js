@@ -12,7 +12,7 @@ const InputForm = ({ label, type, name, placeholder, value, onChange }) => {
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className=""
+        className="w-full border border-primary p-2 rounded-lg focus:border-primary-300 focus:ring-primary-300 focus:ring-2 focus:outline-none"
       />
     </div>
   );

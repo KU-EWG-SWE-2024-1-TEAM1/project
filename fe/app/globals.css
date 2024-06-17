@@ -8,6 +8,10 @@
   box-sizing: border-box;
 }
 
+body {
+  @apply bg-darkBg;
+}
+
 /* 
 html,
 body {
