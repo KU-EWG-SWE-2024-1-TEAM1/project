@@ -1,5 +1,5 @@
 import {  IsOptional, IsString } from "class-validator";
-import { Type } from "class-transformer";
+import { Field } from "../../../utils/mapper/FieldNameExtractor";
 
 export class PostMovieDto {
   @IsString()
@@ -8,9 +8,11 @@ export class PostMovieDto {
   @IsString()
   description: string;
 
-  @Type(() => Date)
-  releaseDate: Date;
+  @IsString()
+  bigImgUrl: string;
 
+  @IsString()
+  thumbNailUrl: string
 
 }
 
@@ -23,18 +25,41 @@ export class UpdateMovieDto {
   @IsOptional()
   description?: string;
 
-  @Type(() => Date)
+  @IsString()
   @IsOptional()
-  releaseDate?: Date;
+  bigImgUrl: string;
+
+  @IsString()
+  @IsOptional()
+  thumbNailUrl: string
 
 }
 
 
 export class ResponseMovieDto {
+  @Field
   id: number;
+
+  @Field
   title: string;
+
+  @Field
   description: string;
-  releaseDate: Date;
-  averageScore: number;
-  searchCount: number;
+
+  @Field
+  bigImgUrl: string;
+
+  @Field
+  thumbNailUrl: string;
+}
+
+export class ShortMovieDto{
+  @Field
+  id: number;
+
+  @Field
+  title: string;
+
+  @Field
+  thumbNailUrl: string;
 }

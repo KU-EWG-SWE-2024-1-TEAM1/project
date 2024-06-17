@@ -2,6 +2,8 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '../modules/user/entity/User';
 import { Post } from "../modules/post/entity/Post";
+import { Movie } from "../modules/movie/entity/Movie";
+import { Comment } from "../modules/comment/entity/Comment";
 
 export const getTypeOrmConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const dbType = configService.get<'sqlite' | 'mysql'>('db.type');
@@ -10,7 +12,7 @@ export const getTypeOrmConfig = (configService: ConfigService): TypeOrmModuleOpt
     database: configService.get<string>('db.database'),
     synchronize: configService.get<boolean>('db.synchronize'),
     logging: configService.get<boolean>('db.logging'),
-    entities: [User,Post],
+    entities: [User,Post,Movie,Comment],
     autoLoadEntities: true,
   };
 

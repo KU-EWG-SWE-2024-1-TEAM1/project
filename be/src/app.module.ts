@@ -3,17 +3,19 @@ dotenv.config();
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from './modules/user/module';
 import { getTypeOrmConfig } from './config/dbconfig';
-import * as yaml from 'js-yaml';
-import * as fs from 'fs';
+import {ConnectionModule} from "./modules/connection/module";
+import { AuthModule } from "./auth/module";
+import { DataModule } from "./modules/data/module";
+import { UserModule } from "./modules/user/module";
 import { PostModule } from "./modules/post/module";
-import { ConnectModule } from "./connect.module";
 import { MovieModule } from "./modules/movie/module";
+import { CommentModule } from "./modules/comment/module";
+import { loadYamlConfig } from "./config/yamlConfig";
 
 const ENV = process.env.NODE_ENV || 'dev';
 const configFilePath = `config/${ENV}.yaml`;
-const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+const config = loadYamlConfig(configFilePath);
 
 @Module({
   imports: [
@@ -23,10 +25,18 @@ const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => getTypeOrmConfig(configService),
+
+      useFactory: async (configService: ConfigService) => ({
+        ...getTypeOrmConfig(configService),
+        autoLoadEntities: true,
+      }),
+
       inject: [ConfigService],
+
     }),
-    ConnectModule, UserModule,PostModule,MovieModule
+    ConnectionModule,DataModule,AuthModule,
+    UserModule,PostModule,MovieModule,CommentModule
   ],
+
 })
 export class AppModule {}
