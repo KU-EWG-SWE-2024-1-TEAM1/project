@@ -4,6 +4,7 @@ import Button from "@/components/button";
 import InputForm from "@/components/inputForm";
 import Logo from "@/components/logo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const SignUp = () => {
@@ -15,6 +16,7 @@ const SignUp = () => {
     confirmPassword: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,6 +60,7 @@ const SignUp = () => {
     }
 
     console.log(inputs);
+    router.push("/login");
   };
 
   return (

@@ -4,11 +4,13 @@ import Button from "@/components/button";
 import InputForm from "@/components/inputForm";
 import Logo from "@/components/logo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const LogIn = () => {
   const [inputs, setInputs] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,6 +34,7 @@ const LogIn = () => {
     setErrorMessage("");
 
     console.log(inputs);
+    // router.push("/main");
   };
 
   return (
