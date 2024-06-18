@@ -49,5 +49,7 @@ jobs:
             npm install
             npm run build
             pm2 stop nestjs-app || true
+            sleep 3
             pm2 delete nestjs-app || true
+            sleep 3
             pm2 start dist/main.js --name nestjs-app
