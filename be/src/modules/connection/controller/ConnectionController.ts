@@ -9,6 +9,8 @@ export class ConnectionController {
   getHealthCheck(): HttpStatus {
     return HttpStatus.OK;
   }
+
+  @Get()
   async getConnections(): Promise<{ today: number; total: number }> {
     return this.connectionService.getConnections();
   }
