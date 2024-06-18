@@ -1,14 +1,14 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {Controller, Get, HttpStatus, Param} from '@nestjs/common';
 import { ConnectionService } from '../service/ConnectionService';
 
 @Controller('api')
 export class ConnectionController {
   constructor(private readonly connectionService: ConnectionService) {}
+
   @Get('/health')
-  getHealthCheck(): string {
-    return '';
+  getHealthCheck(): HttpStatus {
+    return HttpStatus.OK;
   }
-  @Get()
   async getConnections(): Promise<{ today: number; total: number }> {
     return this.connectionService.getConnections();
   }
