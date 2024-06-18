@@ -3,8 +3,7 @@ name: Deploy NestJS App
 on:
   push:
     branches:
-      - main  # 배포를 트리거하는 브랜치
-
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,16 +20,16 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v2
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: be/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/be/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --prefix be
 
       - name: Build project
-        run: npm run build
+        run: npm run build --prefix be
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -43,4 +42,4 @@ jobs:
             git pull origin main
             npm install
             npm run build
-            pm2 restart your-nest-app
+            pm2 restart nestjs-app
