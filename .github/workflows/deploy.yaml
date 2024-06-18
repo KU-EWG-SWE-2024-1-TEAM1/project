@@ -21,16 +21,20 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v2
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: be/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/be/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd be
+          npm install
 
       - name: Build project
-        run: npm run build
+        run: |
+          cd be
+          npm run build
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -39,7 +43,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd project/be
+            cd /path/to/your/project/be
             git pull origin main
             npm install
             npm run build
