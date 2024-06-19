@@ -21,11 +21,55 @@ export class AuthService {
     else throw new UnauthorizedException('Incorrect Password');
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
-    const payload = { email: user.email, sub: user.id, role: user.role };
+  async login(loginDto: LoginDto, response: any) {
+    const { email, password } = loginDto;
+    const user = await this.validateUser(email, password);
+
+    const payload = { email: user.email, sub: user.id };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.generateRefreshToken(user.id);
+
+    AuthService.setCookie(response, refreshToken);
+
     return {
-      access_token: `Bearer ${this.jwtService.sign(payload)}`,
+      access_token: accessToken,
     };
+  }
+
+  private static setCookie(response: any, refreshToken: string) {
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+  }
+
+  generateRefreshToken(userId: string) {
+    const payload = { userId };
+    return this.jwtService.sign(payload, {
+      secret: 'JWT_SECRET_KEY',
+      expiresIn: '1d',
+    });
+  }
+
+  async refreshToken(refreshToken: string) {
+
+      const { userId } = this.jwtService.verify(refreshToken, { secret: 'JWT_SECRET_KEY' });
+      const user = await this.userService.findById(userId);
+
+    try {
+      const payload = { email: user.email, sub: user.id };
+      const newAccessToken = this.jwtService.sign(payload);
+
+      return {
+        access_token: `Bearer ${newAccessToken}`,
+      };
+    } catch (e) {
+      if (e.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Refresh token expired');
+      }
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }
