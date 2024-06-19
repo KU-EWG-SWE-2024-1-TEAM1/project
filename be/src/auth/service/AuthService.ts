@@ -25,24 +25,24 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.validateUser(email, password);
 
-    if (!user) {
-      throw new NotFoundException('Invalid credentials');
-    }
-
     const payload = { email: user.email, sub: user.id };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.generateRefreshToken(user.id);
 
-    response.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    AuthService.setCookie(response, refreshToken);
 
     return {
       access_token: accessToken,
     };
+  }
+
+  private static setCookie(response: any, refreshToken: string) {
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000
+    });
   }
 
   generateRefreshToken(userId: string) {
@@ -57,9 +57,7 @@ export class AuthService {
 
       const { userId } = this.jwtService.verify(refreshToken, { secret: 'JWT_SECRET_KEY' });
       const user = await this.userService.findById(userId);
-      if (!user) {
-        throw new NotFoundException('Invalid user');
-      }
+
     try {
       const payload = { email: user.email, sub: user.id };
       const newAccessToken = this.jwtService.sign(payload);
