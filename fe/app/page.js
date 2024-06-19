@@ -1,17 +1,11 @@
-import Image from "next/image";
+import VideoPlayer from './components/VideoPlayer';
 
 export default function Home() {
-  return (
-    <>
-      <main className="p-4  bg-darkBg">
-        #101322
-        <div className="flex space-x-4">
-          <div className="w-16 h-16 bg-primary">#163D68</div>
-          <div className="w-16 h-16 bg-primary-light">#4263EB</div>
-          <div className="w-16 h-16 bg-textActive">#d4d9e1</div>
-          <div className="w-16 h-16 bg-textInactive">#586a85</div>
+    return (
+        <div className="text-white">
+            <h1>Welcome to Mikaela Reuben's Site</h1>
+            <p>This is the home page content.</p>
+            <VideoPlayer />
         </div>
-      </main>
-    </>
-  );
+    );
 }
