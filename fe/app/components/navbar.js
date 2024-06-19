@@ -1,15 +1,14 @@
-'use Client';
+'use client';
 import Link from 'next/link';
 import Image from "next/image";
 
 const Navbar = () => {
     return (
-        <nav className="fixed top-0 w-full bg-transparent shadow-md z-50">
-            <ul className="flex justify-around items-center py-4 text-white">
-                <li><Link href="/about">ABOUT</Link></li>
-                <li><Link href="/recipes">RECIPES</Link></li>
-                <li><Link href="/videos">VIDEOS</Link></li>
-                <li>
+        <nav className="fixed top-2 w-full bg-white shadow-md z-50 ">
+            <ul className="flex justify-around items-center py-1 text-black">
+                <li><Link href="/movie" className= "opacity-40 hover:opacity-100 transition-opacity duration-300">MOVIES</Link></li>
+                <li><Link href="/post" className= "opacity-40 hover:opacity-100 transition-opacity duration-300">POSTS</Link></li>
+                <li className="absolute top-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                     <Link href="/">
                         <Image
                             src="/movieMovit.webp"
@@ -20,9 +19,8 @@ const Navbar = () => {
                         />
                     </Link>
                 </li>
-                <li><Link href="/cookbook">COOKBOOK</Link></li>
-                <li><Link href="/press">PRESS</Link></li>
-                <li><Link href="/contact">CONTACT</Link></li>
+                <li><Link href="/signin" className= "opacity-40 hover:opacity-100 transition-opacity duration-300">SIGN IN</Link></li>
+                <li><Link href="/login" className= "opacity-40 hover:opacity-100 transition-opacity duration-300">LOGIN</Link></li>
             </ul>
         </nav>
     );
