@@ -17,7 +17,7 @@ export default function Home() {
                     </p>
                     <p className="text-lg text-black font-handwriting mb-4">
                         최신 영화 정보를 빠르게 확인하고, 영화 팬들과 함께 즐거운 시간을 보내세요.<br/>
-                        MOVIE MOVIT 에서는 영화 예고편, 리뷰, 그리고 각종 이벤트 후기들도 함께 제공됩니다!
+                        MOVIE MOVIT 에서는 영화 예고편, 리뷰, 그리고 각종 이벤트 후기들도 함께 제공됩니다.
                     </p>
                     <p className="text-lg text-gray-600 font-handwriting">
                         MOVIE MOVIT 는 영화 팬 여러분을 위한 최고의 영화 커뮤니티입니다.<br/>
