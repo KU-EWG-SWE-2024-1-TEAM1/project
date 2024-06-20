@@ -13,7 +13,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ruby
-          gem install mustache
+          sudo gem install mustache
       - name: creates output
         run: sh ./build.sh
       - name: Debug - List files
@@ -35,10 +35,9 @@ jobs:
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
 
-
   deploy-backend:
     runs-on: ubuntu-latest
-    needs: build-frontend # build-frontend 작업이 완료된 후 실행되도록 설정
+    needs: build-frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
