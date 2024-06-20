@@ -7,7 +7,6 @@ import Toolbar from "./toolbar";
 import formats from "./formats";
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-
 const Editor = () => {
     const [values, setValues] = useState('');
     const modules = Toolbar();
