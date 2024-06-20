@@ -13,13 +13,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ruby
-          sudo gem install mustache
+          sudo gem install mustache  # sudo를 사용하여 gem을 설치합니다.
       - name: creates output
-        run: sh ./build.sh
-      - name: Debug - List files
-        run: ls -la
-      - name: Debug - List output directory
-        run: ls -la output
+        run: sh ./build.sh  # 경로가 올바른지 확인
+      - name: Check output directory
+        run: |
+          if [ -d "./output" ]; then
+            echo "Output directory exists."
+            ls -la ./output
+          else
+            echo "Output directory does not exist."
+          fi
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
