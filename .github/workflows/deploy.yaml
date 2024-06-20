@@ -7,13 +7,19 @@ on:
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
-    container: pandoc/latex
     steps:
       - uses: actions/checkout@v2
-      - name: Install mustache (to update the date)
-        run: apk add ruby && gem install mustache
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby
+          gem install mustache
       - name: creates output
         run: sh ./build.sh
+      - name: Debug - List files
+        run: ls -la
+      - name: Debug - List output directory
+        run: ls -la output
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
@@ -28,6 +34,7 @@ jobs:
           target-branch: main
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
+
 
   deploy-backend:
     runs-on: ubuntu-latest
