@@ -9,13 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ruby
-          sudo gem install mustache  # sudo를 사용하여 gem을 설치합니다.
-      - name: creates output
-        run: sh ./build.sh  # 경로가 올바른지 확인
+          sudo gem install mustache
+
+      - name: Create output directory and copy files
+        run: |
+          mkdir -p output
+          cp -R ./fe/* ./output
+          chmod +x ./build.sh
+          sh ./build.sh
+
       - name: Check output directory
         run: |
           if [ -d "./output" ]; then
@@ -24,7 +31,8 @@ jobs:
           else
             echo "Output directory does not exist."
           fi
-      - name: Pushes to another repository
+
+      - name: Push to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
         env:
@@ -36,8 +44,6 @@ jobs:
           user-email: ${{ secrets.MYEMAIL }}
           commit-message: ${{ github.event.commits[0].message }}
           target-branch: main
-      - name: Test get variable exported by push-to-another-repository
-        run: echo $DESTINATION_CLONED_DIRECTORY
 
   deploy-backend:
     runs-on: ubuntu-latest
