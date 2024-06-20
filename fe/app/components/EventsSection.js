@@ -10,13 +10,13 @@ const EventsSection = ({ events }) => {
                         {events.slice(0, 4).map((event) => (
                             <div
                                 key={event.id}
-                                className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48"
-                                style={{ clipPath: 'polygon(10% 100%, 100% 100%, 90% 0%, 0% 0%)' }}
+                                className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-left"
                             >
                                 <Image
                                     src={event.thumbnailURL}
                                     alt={event.title}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 12vw"
                                     style={{ objectFit: 'cover' }}
                                     className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                                 />
@@ -30,13 +30,13 @@ const EventsSection = ({ events }) => {
                         {events.slice(4).map((event) => (
                             <div
                                 key={event.id}
-                                className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48"
-                                style={{ clipPath: 'polygon(0% 100%, 95% 100%, 100% 0%, 5% 0%)' }}
+                                className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-right"
                             >
                                 <Image
                                     src={event.thumbnailURL}
                                     alt={event.title}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 12vw"
                                     style={{ objectFit: 'cover' }}
                                     className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                                 />

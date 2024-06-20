@@ -9,7 +9,7 @@ export default function Home() {
                 <div className="text-left p-8 max-w-3xl">
                     <h1 className="text-4xl font-bold mb-4 gradient-text">Welcome to Movie Movit!</h1>
                     <p className="text-lg text-black font-handwriting mb-4">
-                        MOVIE MOVIT에서 최신 영화와  관련 이벤트를 소개합니다.
+                        MOVIE MOVIT에서 최신 영화와 관련 이벤트를 소개합니다.
                     </p>
                     <p className="text-lg text-gray-600 font-handwriting mb-4">
                         영화 팬 여러분을 위한 다양한 특별 행사를 만나보세요.<br/>
@@ -17,7 +17,7 @@ export default function Home() {
                     </p>
                     <p className="text-lg text-black font-handwriting mb-4">
                         최신 영화 정보를 빠르게 확인하고, 영화 팬들과 함께 즐거운 시간을 보내세요.<br/>
-                        MOVIE MOVIT에서는 영화 예고편, 리뷰, 그리고 후기들도 함께 제공됩니다.
+                        MOVIE MOVIT에서는 영화 예고편, 리뷰, 그리고 각종 이벤트 후기들도 함께 제공됩니다.
                     </p>
                     <p className="text-lg text-gray-600 font-handwriting">
                         MOVIE MOVIT는 영화 팬 여러분을 위한 최고의 영화 커뮤니티입니다.<br/>

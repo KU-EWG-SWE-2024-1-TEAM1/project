@@ -1,7 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['t1.daumcdn.net'], // 외부 이미지를 허용할 도메인 추가
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 't1.daumcdn.net',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'moviemovit.s3.ap-northeast-2.amazonaws.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
     },
 };
 
