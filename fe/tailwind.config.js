@@ -23,7 +23,7 @@ module.exports = {
       },
       clipPath: {
         'custom-left': 'polygon(10% 100%, 100% 100%, 90% 0%, 0% 0%)',
-        'custom-right': 'polygon(0% 100%, 95% 100%, 100% 0%, 5% 0%)',
+        'custom-right': 'polygon(0% 100%, 90% 100%, 100% 0%, 10% 0%)',
       },
     },
   },
