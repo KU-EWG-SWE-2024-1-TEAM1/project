@@ -18,17 +18,14 @@ module.exports = {
         textInactive: "#586a85",
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        handwriting: ['Dancing Script', 'cursive'],
+        sans: ["Inter", "sans-serif"],
+        handwriting: ["Dancing Script", "cursive"],
       },
       clipPath: {
-        'custom-left': 'polygon(10% 100%, 100% 100%, 90% 0%, 0% 0%)',
-        'custom-right': 'polygon(0% 100%, 90% 100%, 100% 0%, 10% 0%)',
+        "custom-left": "polygon(10% 100%, 100% 100%, 90% 0%, 0% 0%)",
+        "custom-right": "polygon(0% 100%, 90% 100%, 100% 0%, 10% 0%)",
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('tailwind-clip-path'),
-  ],
+  plugins: [require("@tailwindcss/forms"), require("tailwind-clip-path")],
 };
