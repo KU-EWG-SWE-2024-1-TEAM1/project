@@ -3,6 +3,7 @@ export function mapToDto<Entity, Dto>(entity: Entity, dtoClass: new () => Dto): 
   const fields: string[] = Reflect.getMetadata('fields', dtoClass.prototype) || [];
   const fieldTypes: { [key: string]: any } = Reflect.getMetadata('fieldTypes', dtoClass.prototype) || {};
 
+
   fields.forEach((field) => {
     if (entity.hasOwnProperty(field)) {
       const fieldType = fieldTypes[field];

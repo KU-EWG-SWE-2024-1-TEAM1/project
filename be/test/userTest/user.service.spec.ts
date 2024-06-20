@@ -19,6 +19,7 @@ const mockUserRepository = () => ({
 const mockUser: User = {
   id: 1,
   name: 'Test User',
+  nickname: 'Test Nickname',
   email: 'test@example.com',
   password: 'password',
   salt: 'salt',
@@ -50,7 +51,7 @@ describe('UserService', () => {
       userRepository.save.mockResolvedValue(mockUser);
       userRepository.findOne.mockResolvedValue(null);
 
-      const postUserDto: PostUserDto = { name: 'Test User', email: 'test@example.com', password: 'password' };
+      const postUserDto: PostUserDto = { name: 'Test User',nickname: 'Test Nickname', email: 'test@example.com', password: 'password' };
       const result = await userService.create(postUserDto);
 
       expect(userRepository.create).toHaveBeenCalledWith(postUserDto);
@@ -58,6 +59,7 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: 1,
         name: 'Test User',
+        nickname: 'Test Nickname',
         email: 'test@example.com',
       });
     });
@@ -65,7 +67,7 @@ describe('UserService', () => {
     it('should throw an error if email already exists', async () => {
       userRepository.findOne.mockResolvedValue(mockUser);
 
-      const postUserDto: PostUserDto = { name: 'Test User', email: 'test@example.com', password: 'password' };
+      const postUserDto: PostUserDto = { name: 'Test User',nickname: 'Test Nickname', email: 'test@example.com', password: 'password' };
 
       await expect(userService.create(postUserDto)).rejects.toThrow(BadRequestException);
     });
@@ -82,6 +84,7 @@ describe('UserService', () => {
         id: 1,
         name: 'Test User',
         email: 'test@example.com',
+        nickname: 'Test Nickname',
       });
     });
 
@@ -115,6 +118,7 @@ describe('UserService', () => {
           id: 1,
           name: 'Test User',
           email: 'test@example.com',
+          nickname: 'Test Nickname',
         },
       ]);
     });
@@ -122,7 +126,7 @@ describe('UserService', () => {
 
   describe('update', () => {
     it('should update a user successfully', async () => {
-      const updateUserDto: UpdateUserDto = { name: 'Updated User', email: 'updated@example.com' };
+      const updateUserDto: UpdateUserDto = { name: 'Updated User' };
       const updatedUser = { ...mockUser, ...updateUserDto };
 
       userRepository.findById.mockResolvedValue(mockUser);
@@ -134,14 +138,15 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: 1,
         name: 'Updated User',
-        email: 'updated@example.com',
+        nickname: 'Test Nickname',
+        email: 'test@example.com'
       });
     });
 
     it('should throw an error if user is not found', async () => {
       userRepository.findById.mockResolvedValue(null);
 
-      const updateUserDto: UpdateUserDto = { name: 'Updated User', email: 'updated@example.com' };
+      const updateUserDto: UpdateUserDto = { name: 'Updated User' };
 
       await expect(userService.update(1, updateUserDto)).rejects.toThrow(NotFoundException);
     });

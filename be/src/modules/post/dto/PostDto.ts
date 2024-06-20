@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional } from "class-validator";
+import {IsString, IsInt, IsOptional, IsArray} from "class-validator";
 import { Type } from "class-transformer";
 import { AuthorUserDto } from '../../user/dto/UserDto';
 import { Field } from "../../../utils/mapper/FieldNameExtractor";
@@ -13,11 +13,15 @@ export class PostPostDto {
 
   @Type(() => Number)
   @IsInt()
-  userId: number;
-
-  @Type(() => Number)
-  @IsInt()
   movieId: number;
+
+  @IsString()
+  thumbnailURL: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  photosURL?: string[];
 }
 
 export class UpdatePostDto {
@@ -28,6 +32,15 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   content?: string;
+
+  @IsOptional()
+  @IsString()
+  thumbnailURL?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photosURL?: string[];
 }
 
 
@@ -53,6 +66,15 @@ export class ResponsePostDto {
   @Field
   updatedAt: Date;
 
+  @Field
+  score: number;
+
+  @Field
+  thumbnailURL: string;
+
+  @Field
+  photosURL?: string[];
+
 }
 
 export class ShortPostDto{
@@ -60,4 +82,6 @@ export class ShortPostDto{
   id: number;
   @Field
   title: string;
+  @Field
+  thumbnailURL: string
 }

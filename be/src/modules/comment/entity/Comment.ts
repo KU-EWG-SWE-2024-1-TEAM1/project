@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column,  ManyToOne,  Unique } from "typeorm";
 import { User } from '../../user/entity/User';
 import { Post } from '../../post/entity/Post';
 
@@ -16,7 +16,6 @@ export class Comment {
   @ManyToOne(() => User, user => user.comments)
   user: User;
 
-  @OneToOne(() => Post, post => post.comment)
-  @JoinColumn()
+  @ManyToOne(() => Post, post => post.comments)
   post: Post;
 }

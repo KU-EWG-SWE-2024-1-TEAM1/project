@@ -12,6 +12,7 @@ import { MovieService } from "../movie/service/MovieService";
 import { CommentService } from "../comment/service/CommentService";
 import { CommentRepository } from "../comment/repository/CommentRepository";
 import { MovieRepository } from "../movie/repository/MovieRepository";
+import { AdminService } from "./admin/AdminService";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post, User,Movie,Comment])],
@@ -19,7 +20,8 @@ import { MovieRepository } from "../movie/repository/MovieRepository";
     UserService,UserRepository,
     PostService,PostRepository,
     MovieService,MovieRepository,
-    CommentService,CommentRepository
+    CommentService,CommentRepository,
+    AdminService
     ],
   exports: [
     UserService,UserRepository,
