@@ -1,3 +1,4 @@
+'use client'
 import Quill from 'quill';
 
 export const fontList = [
