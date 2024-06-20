@@ -8,6 +8,10 @@
   box-sizing: border-box;
 }
 
+body {
+  @apply bg-darkBg;
+}
+
 /* 
 html,
 body {
@@ -24,3 +28,9 @@ ul,
 ol {
   list-style: none;
 } */
+.gradient-text {
+  background: linear-gradient(to bottom right, palegoldenrod, darkgoldenrod);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  overflow: hidden;
+}
