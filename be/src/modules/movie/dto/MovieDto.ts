@@ -9,6 +9,9 @@ export class PostMovieDto {
   description: string;
 
   @IsString()
+  youtubeUrl: string
+
+  @IsString()
   bigImgUrl: string;
 
   @IsString()
@@ -24,6 +27,10 @@ export class UpdateMovieDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  youtubeUrl: string
 
   @IsString()
   @IsOptional()
@@ -51,6 +58,9 @@ export class ResponseMovieDto {
 
   @Field
   thumbNailUrl: string;
+
+  @Field
+  youtubeUrl: string
 }
 
 export class ShortMovieDto{
