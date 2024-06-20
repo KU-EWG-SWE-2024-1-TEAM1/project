@@ -16,7 +16,7 @@ export default function Home() {
                         시사회, 굿즈샵, 팬미팅, 그리고 영화 제작 과정 체험 워크샵까지, 영화의 매력에 흠뻑 빠질 수 있는 다채로운 이벤트가 준비되어 있습니다.
                     </p>
                     <p className="text-lg text-black font-handwriting mb-4">
-                        최신 영화 정보를 빠르게 확인하고, 영화 팬들과 함께 즐거운 시간을 보내세요.<br/>
+                        최신 영화 정보를 빠르게 확인하고, 영화 팬들과 함께 즐거운 시간을 보내세요!<br/>
                         MOVIE MOVIT 에서는 영화 예고편, 리뷰, 그리고 각종 이벤트 후기들도 함께 제공됩니다.
                     </p>
                     <p className="text-lg text-gray-600 font-handwriting">
