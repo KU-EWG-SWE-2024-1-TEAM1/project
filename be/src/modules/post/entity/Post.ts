@@ -29,6 +29,12 @@ export class Post extends BaseEntity{
   @Column({ default: 0 })
   view: number;
 
+  @Column({ length: 255, nullable: true })
+  thumbnailURL: string;
+
+  @Column('simple-array', { nullable: true })
+  photosURL: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 

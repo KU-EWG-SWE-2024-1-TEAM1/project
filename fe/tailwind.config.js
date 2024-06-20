@@ -17,6 +17,10 @@ module.exports = {
         textActive: "#d4d9e1",
         textInactive: "#586a85",
       },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        handwriting: ['Dancing Script', 'cursive'],
+      },
     },
   },
   plugins: [],
