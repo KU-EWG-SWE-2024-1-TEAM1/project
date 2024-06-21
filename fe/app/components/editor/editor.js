@@ -1,14 +1,12 @@
 'use client';
 import dynamic from 'next/dynamic';
-import {useState} from 'react';
 import 'react-quill/dist/quill.snow.css';
 import FontSelector from './fontSelector';
 import Toolbar from "./toolbar";
 import formats from "./formats";
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const Editor = () => {
-    const [values, setValues] = useState('');
+const Editor = ({ value, onChange }) => {
     const modules = Toolbar();
 
     return (
@@ -18,8 +16,8 @@ const Editor = () => {
                 theme="snow"
                 modules={modules}
                 formats={formats}
-                value={values}
-                onChange={setValues}
+                value={value}
+                onChange={onChange}
                 className="h-full flex-grow"
             />
         </div>
@@ -27,4 +25,3 @@ const Editor = () => {
 };
 
 export default Editor;
-

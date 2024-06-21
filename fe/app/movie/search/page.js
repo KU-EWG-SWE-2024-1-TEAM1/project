@@ -1,6 +1,6 @@
 "use client";
 
-import { searchMovie } from "@/api/openApi";
+import { searchMovie } from "@/app/api/openApi";
 import Button from "@/components/button";
 import InputForm from "@/components/inputForm";
 import React, { useState } from "react";

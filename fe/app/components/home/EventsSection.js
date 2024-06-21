@@ -13,7 +13,7 @@ const EventsSection = ({ events }) => {
                                 className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-left"
                             >
                                 <Image
-                                    src={event.thumbnailURL}
+                                    src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${event.thumbnailURL}`}
                                     alt={event.title}
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 12vw"
@@ -33,7 +33,7 @@ const EventsSection = ({ events }) => {
                                 className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-right"
                             >
                                 <Image
-                                    src={event.thumbnailURL}
+                                    src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${event.thumbnailURL}`}
                                     alt={event.title}
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 12vw"
