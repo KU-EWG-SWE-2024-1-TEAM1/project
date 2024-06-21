@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Nanum+Pen+Script&family=Do+Hyeon&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,4 +35,23 @@ ol {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   overflow: hidden;
+}
+.ql-font-Noto-Sans-KR {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.ql-font-Nanum-Gothic {
+  font-family: 'Nanum Gothic', sans-serif;
+}
+
+.ql-font-Nanum-Myeongjo {
+  font-family: 'Nanum Myeongjo', serif;
+}
+
+.ql-font-Nanum-Pen-Script {
+  font-family: 'Nanum Pen Script', cursive;
+}
+
+.ql-font-Do-Hyeon {
+  font-family: 'Do Hyeon', sans-serif;
 }
