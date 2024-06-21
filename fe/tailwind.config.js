@@ -20,6 +20,12 @@ module.exports = {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         handwriting: ["Dancing Script", "cursive"],
+        'noto-sans-kr': ['Noto Sans KR', 'sans-serif'],
+        'nanum-gothic': ['Nanum Gothic', 'sans-serif'],
+        'nanum-myeongjo': ['Nanum Myeongjo', 'serif'],
+        'nanum-pen-script': ['Nanum Pen Script', 'cursive'],
+        'do-hyeon': ['Do Hyeon', 'sans-serif'],
+
       },
       clipPath: {
         "custom-left": "polygon(10% 100%, 100% 100%, 90% 0%, 0% 0%)",

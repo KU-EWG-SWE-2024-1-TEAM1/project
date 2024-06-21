@@ -36,22 +36,22 @@ ol {
   -webkit-text-fill-color: transparent;
   overflow: hidden;
 }
-.ql-font-Noto-Sans-KR {
+.Noto-Sans-KR {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.ql-font-Nanum-Gothic {
+.Nanum-Gothic {
   font-family: 'Nanum Gothic', sans-serif;
 }
 
-.ql-font-Nanum-Myeongjo {
+.Nanum-Myeongjo {
   font-family: 'Nanum Myeongjo', serif;
 }
 
-.ql-font-Nanum-Pen-Script {
+.Nanum-Pen-Script {
   font-family: 'Nanum Pen Script', cursive;
 }
 
-.ql-font-Do-Hyeon {
+.Do-Hyeon {
   font-family: 'Do Hyeon', sans-serif;
 }
