@@ -15,7 +15,7 @@ const EventsSection = ({ events }) => {
                                 className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-left"
                                 style={{
                                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
-                                    border: '2px solid goldenrod',
+                                    border: '3px solid goldenrod',
                                     borderRadius: '10px',
                                     overflow: 'hidden'
                                 }}
@@ -50,7 +50,7 @@ const EventsSection = ({ events }) => {
                                 className="relative shadow-md overflow-hidden group h-80 w-full lg:w-48 lg:clip-path-custom-right"
                                 style={{
                                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
-                                    border: '2px solid goldenrod',
+                                    border: '3px solid goldenrod',
                                     borderRadius: '10px',
                                     overflow: 'hidden'
                                 }}
