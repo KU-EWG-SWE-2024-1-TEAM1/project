@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import videos from './Videos';
+import parse from 'html-react-parser';
 
 const VideoPlayer = () => {
     const videoRef = useRef(null);
@@ -15,6 +16,7 @@ const VideoPlayer = () => {
             setShowOverlay(false);
         }
     };
+
     const handleNextVideo = () => {
         setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
     };
@@ -68,8 +70,9 @@ const VideoPlayer = () => {
             </button>
             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-15 text-white p-4">
                 <h2 className="text-lg md:text-2xl font-bold">{videos[currentVideoIndex].title}</h2>
-                <p className="mt-2 text-sm md:text-base lg:text-lg"
-                   dangerouslySetInnerHTML={{__html: videos[currentVideoIndex].description}}></p>
+                <p className="mt-2 text-sm md:text-base lg:text-lg">
+                    {parse(videos[currentVideoIndex].description)}
+                </p>
             </div>
         </div>
     );

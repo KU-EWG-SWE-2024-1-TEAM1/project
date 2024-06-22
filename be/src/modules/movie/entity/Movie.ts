@@ -18,6 +18,9 @@ export class Movie extends BaseEntity{
   @Column()
   thumbNailUrl: string;
 
+  @Column()
+  youtubeUrl: string
+
   @CreateDateColumn()
   createdAt: Date;
 

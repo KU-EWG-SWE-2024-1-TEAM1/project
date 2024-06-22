@@ -10,8 +10,17 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "dompurify": "^3.1.5",
     "next": "latest",
+    "quill": "^2.0.2",
+    "quill-image-resize": "^3.0.9",
+    "quill-resize-image": "^1.0.4",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-quill": "^2.0.0",
+    "slate-history": "^0.100.0",
+    "slate-hyperscript": "^0.100.0",
+    "slate-react": "^0.105.0"
   }
 }
