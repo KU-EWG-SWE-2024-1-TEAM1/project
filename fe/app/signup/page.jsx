@@ -6,6 +6,7 @@ import Logo from "@/components/logo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import {signupApi} from "@/app/api/signup/api";
 
 const SignUp = () => {
   const [inputs, setInputs] = useState({
@@ -52,15 +53,19 @@ const SignUp = () => {
     return true;
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
-
-    console.log(inputs);
-    router.push("/login");
+    try {
+      const result = await signupApi(inputs);
+      console.log('회원가입 성공:', result);
+      router.push("/login");
+    } catch (error) {
+      setErrorMessage('회원가입 실패: ' + error.message);
+    }
   };
 
   return (
@@ -114,16 +119,7 @@ const SignUp = () => {
               {errorMessage}
             </span>
           )}
-          <Button
-            type="submit"
-            disabled={
-              !inputs.name ||
-              !inputs.email ||
-              !inputs.nickname ||
-              !inputs.password ||
-              !inputs.confirmPassword
-            }
-          >
+          <Button type="submit">
             SIGN UP
           </Button>
         </form>

@@ -25,14 +25,14 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.validateUser(email, password);
 
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: user.role };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.generateRefreshToken(user.id);
 
     AuthService.setCookie(response, refreshToken);
 
     return {
-      access_token: accessToken,
+      access_token: `Bearer ${accessToken}`,
     };
   }
 
@@ -59,7 +59,7 @@ export class AuthService {
       const user = await this.userService.findById(userId);
 
     try {
-      const payload = { email: user.email, sub: user.id };
+      const payload = { email: user.email, sub: user.id, role: user.role };
       const newAccessToken = this.jwtService.sign(payload);
 
       return {
