@@ -1,6 +1,5 @@
 import parse from 'html-react-parser';
 import movieSample from '@/app/movie/view/sample';
-import YouTubeEmbed from "@/components/youtube";
 
 const SubmittedPost = ({ data = movieSample }) => {
     const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description } = data;
@@ -22,6 +21,7 @@ const SubmittedPost = ({ data = movieSample }) => {
 
     const updatedDescription = addCloudFrontUrl(description);
     const youtubeId = extractYouTubeID(youtubeUrl);
+    const embedUrl = youtubeId ? `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1` : null;
 
     return (
         <div className="mt-8 p-4 bg-transparent text-white shadow-md rounded-md relative">
@@ -33,10 +33,17 @@ const SubmittedPost = ({ data = movieSample }) => {
                 height: '35vh',
                 width: '100%'
             }}>
-                {youtubeId && (
+                {embedUrl && (
                     <div className="mb-4 flex justify-center w-full">
                         <div className="mt-12 w-full max-w-2xl">
-                            <YouTubeEmbed videoId={youtubeId}/>
+                            <iframe
+                                width="100%"
+                                height="390"
+                                src={embedUrl}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title="YouTube video player"
+                            />
                         </div>
                     </div>
                 )}
