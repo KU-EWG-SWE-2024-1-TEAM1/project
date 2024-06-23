@@ -35,19 +35,13 @@ const SubmittedPost = ({ data = movieSample }) => {
                 {youtubeId && (
                     <div className="mb-4 flex justify-center w-full">
                         <div className="mt-12 w-full max-w-2xl">
-                            <iframe
-                                width="100%"
-                                height="315"
-                                src={`https://www.youtube.com/embed/${youtubeId}`}
-                                title="YouTube video player"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
+                            <YouTubeEmbed videoId={youtubeId}/>
                         </div>
                     </div>
                 )}
             </div>
-            <div className="relative z-10 p-4 text-white max-w-6xl mx-auto" style={{ minHeight: '50vh', marginTop: '4rem' }}>
+            <div className="relative z-10 p-4 text-white max-w-6xl mx-auto"
+                 style={{minHeight: '50vh', marginTop: '4rem'}}>
                 {parse(updatedDescription)}
                 {thumbNailUrl && (
                     <div className="mt-4 flex justify-center">

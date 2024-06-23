@@ -2,7 +2,7 @@ import { Inter } from "next/font/google";
 import Navbar from "./components/Navbar";
 import "./globals.css";
 import Footer from "@/components/footer";
-import ProviderWrapper from "@/app/components/csrWrapper/ProviderWrapper"; // ProviderWrapper 가져오기
+import ClientProvider from "@/app/components/ClientProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +15,10 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={inter.className}>
+                <ClientProvider>
                 <Navbar />
-                <ProviderWrapper>{children}</ProviderWrapper>
+                {children}
+                </ClientProvider>
                 <Footer />
             </body>
         </html>

@@ -1,5 +1,5 @@
 export const loginApi = async (email, password) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -11,7 +11,9 @@ export const loginApi = async (email, password) => {
         throw new Error('Failed to login');
     }
 
-    return response.json();
+    const data = await response.json();
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('accessToken', data.access_token);
+    }
+    return data;
 };
-export default class api {
-}
