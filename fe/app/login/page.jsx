@@ -6,6 +6,7 @@ import Logo from "@/components/logo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import api from '../api/login/api'
 
 const LogIn = () => {
   const [inputs, setInputs] = useState({ email: "", password: "" });
@@ -19,7 +20,7 @@ const LogIn = () => {
     setInputs(newInputs);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     const emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,9 +33,18 @@ const LogIn = () => {
       return;
     }
     setErrorMessage("");
+    try {
+      const result = await api(inputs.email, inputs.password);
+      dispatch(login({email: inputs.email, token: result.token}));
+      // 성공적으로 로그인 처리 (예: 토큰 저장, 리다이렉트 등)
+      console.log(result);
+    } catch (error) {
+      setErrorMessage('로그인 실패: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    console.log(inputs);
-    // router.push("/main");
   };
 
   return (
