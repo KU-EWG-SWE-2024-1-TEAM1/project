@@ -1,5 +1,6 @@
 import parse from 'html-react-parser';
 import movieSample from '@/app/movie/view/sample';
+import YouTubeEmbed from "@/components/youtube";
 
 const SubmittedPost = ({ data = movieSample }) => {
     const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description } = data;
