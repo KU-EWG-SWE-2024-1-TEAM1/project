@@ -39,10 +39,8 @@ const CreateMovie = () => {
             thumbNailUrl: `${uploadedThumbnailUrl}`,
         };
 
-        console.log(movieData);
-
         try {
-            await axios.post('/api/movies', movieData);
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movies`, movieData);
             alert('Movie created successfully!');
         } catch (error) {
             console.error('Error creating movie:', error);
