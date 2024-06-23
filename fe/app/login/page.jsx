@@ -68,7 +68,7 @@ const LogIn = () => {
                 label="PASSWORD"
                 type="password"
                 name="password"
-                placeholder="●●●●●●●●"
+                placeholder="8글자 이상 입력해야 합니다."
                 value={inputs.password}
                 onChange={handleChange}
             />
