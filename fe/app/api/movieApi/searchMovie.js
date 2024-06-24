@@ -8,10 +8,8 @@ export const searchMovie = async (movieTitle) => {
             throw new Error(`${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
         return data.movieListResult.movieList;
     } catch (error) {
-        console.error(error);
         throw error;
     }
 };

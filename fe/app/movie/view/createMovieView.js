@@ -1,6 +1,7 @@
 import parse from 'html-react-parser';
+import YouTubeEmbed from "@/app/movie/view/youtube";
 
-const SubmittedMovie = ({ data }) => {
+const CreateMovieView = ({ data }) => {
     const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description, movieInfo } = data;
 
     const addCloudFrontUrl = (html) => {
@@ -33,21 +34,14 @@ const SubmittedMovie = ({ data }) => {
                 width: '100vw'
             }}>
                 {embedUrl && (
-                    <div className="-ml-20 mb-4 flex justify-center w-full">
+                    <div className="mb-4 flex justify-center w-full">
                         <div className="mt-12 w-full max-w-2xl z-50 justify-items-center">
-                            <iframe
-                                width="120%"
-                                height="350"
-                                src={embedUrl}
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                title="YouTube video player"
-                            />
+                            <YouTubeEmbed videoId={youtubeId} />
                         </div>
                     </div>
                 )}
             </div>
-            <div className="relative z-10 p-4 text-white max-w-6xl mx-auto"
+            <div className="relative z-10 p-4 text-white mx-auto my-40 max-w-screen-xl"
                  style={{ minHeight: '50vh', marginTop: '4rem' }}>
                 {parse(updatedDescription)}
                 {thumbNailUrl && (
@@ -74,4 +68,4 @@ const SubmittedMovie = ({ data }) => {
     );
 };
 
-export default SubmittedMovie;
+export default CreateMovieView;

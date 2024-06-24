@@ -56,9 +56,9 @@ const CreateMovie = () => {
     const youtubeID = extractYouTubeID(youtubeUrl);
 
     return (
-        <div className="container mx-auto my-40">
+        <div className="container mx-auto my-40 max-w-screen-xl">
             <form onSubmit={handleSubmit}>
-                <div className="mb-4">
+            <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
                     <input
                         type="text"
