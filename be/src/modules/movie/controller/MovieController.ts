@@ -1,6 +1,6 @@
 import {Controller,Get,Post,Patch,Delete,Param,Body,UsePipes,ValidationPipe,ParseIntPipe,Query, UseGuards} from "@nestjs/common";
 import { MovieService } from '../service/MovieService';
-import { PostMovieDto, UpdateMovieDto, ResponseMovieDto } from '../dto/MovieDto';
+import {PostMovieDto, UpdateMovieDto, ResponseMovieDto, ShortMovieDto} from '../dto/MovieDto';
 import { PaginationDto } from "../../../utils/pagination/paginationDto";
 import { PaginationResult } from "../../../utils/pagination/pagination";
 import { AuthGuard } from "../../../auth/JwtAuthGuard/JwtAuthGuard";
@@ -14,7 +14,7 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  async findAll(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ResponseMovieDto>> {
+  async findAll(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ShortMovieDto>> {
     return this.movieService.findAll(paginationDto);
   }
 

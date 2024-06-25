@@ -1,5 +1,5 @@
 import parse from 'html-react-parser';
-import YouTubeEmbed from "@/app/movie/view/youtube";
+import YouTubeEmbed from "@/app/movie/[id]/youtube";
 
 const CreateMovieView = ({ data }) => {
     const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description, movieInfo } = data;
@@ -42,10 +42,10 @@ const CreateMovieView = ({ data }) => {
                 )}
             </div>
             <div className="relative z-10 p-4 text-white mx-auto my-40 max-w-screen-xl"
-                 style={{ minHeight: '50vh', marginTop: '4rem' }}>
+                 style={{ minHeight: '50vh', marginTop: '4rem', height: 'auto' }}>
                 {parse(updatedDescription)}
                 {thumbNailUrl && (
-                    <div className="mt-4 flex justify-center items-center"  style={{fontSize: '1.5rem'}}>
+                    <div className="mt-20 flex justify-center items-center bg-gray-800 bg-opacity-50 p-4 rounded"  style={{fontSize: '1.5rem'}}>
                         <img className="max-w-xs rounded-lg shadow-lg mr-4"
                              src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${thumbNailUrl}`} alt="Thumbnail"/>
                         {movieInfo && (
