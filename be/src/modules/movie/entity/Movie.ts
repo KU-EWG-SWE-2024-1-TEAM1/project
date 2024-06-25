@@ -9,7 +9,7 @@ export class Movie extends BaseEntity{
   @Column()
   title: string;
 
-  @Column()
+  @Column("text")
   description: string;
 
   @Column()
