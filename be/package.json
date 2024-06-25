@@ -1,7 +1,7 @@
 {
   "name": "be",
   "version": "0.0.1",
-  "description": "",
+  "description": "Movie Movit project backend server",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
