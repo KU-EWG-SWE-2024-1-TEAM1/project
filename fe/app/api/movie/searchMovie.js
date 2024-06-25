@@ -1,4 +1,4 @@
-const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+const apiKey = process.env.NEXT_PUBLIC_MOVIE_API_KEY;
 
 export const searchMovie = async (movieTitle) => {
     const url = `http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=${apiKey}&movieNm=${movieTitle}`;
