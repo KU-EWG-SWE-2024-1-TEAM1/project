@@ -55,9 +55,6 @@ const CreateMovieView = ({ data }) => {
                                 {movieInfo.prdtYear && <li><strong>제작 연도:</strong> {movieInfo.prdtYear}</li>}
                                 {movieInfo.openDt && <li><strong>개봉 연도:</strong> {movieInfo.openDt}</li>}
                                 {movieInfo.genreNm && <li><strong>장르:</strong> {movieInfo.genreNm}</li>}
-                                {movieInfo.directors.length > 0 && <li>
-                                    <strong>감독:</strong> {movieInfo.directors.map(director => director.peopleNm).join(', ')}
-                                </li>}
                                 {movieInfo.showTm && <li><strong>상영 시간:</strong> {movieInfo.showTm} 분</li>}
                             </ul>
                         )}
