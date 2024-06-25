@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieRepository } from '../repository/MovieRepository';
 import { Movie } from '../entity/Movie';
-import { PostMovieDto, UpdateMovieDto, ResponseMovieDto } from '../dto/MovieDto';
+import {PostMovieDto, UpdateMovieDto, ResponseMovieDto, ShortMovieDto} from '../dto/MovieDto';
 import { paginate, PaginationResult } from "../../../utils/pagination/pagination";
 import { PaginationDto } from "../../../utils/pagination/paginationDto";
 import { mapToDto } from "../../../utils/mapper/Mapper";
@@ -31,16 +31,13 @@ export class MovieService {
     return movie;
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ResponseMovieDto>> {
+  async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ShortMovieDto>> {
     const { page, limit, field, order } = paginationDto;
-    const result = await this.handleErrors(
-      () => paginate(this.movieRepository, { page, limit, field, order }),
-      'Failed to fetch movies',
-    );
+    const [movies, total] = await this.movieRepository.findPaginatedMovies(page, limit, field, order.toUpperCase() as 'ASC' | 'DESC');
 
     return {
-      data: result.data.map(movie => mapToDto(movie,ResponseMovieDto)),
-      total: result.total,
+      data: movies.map(movie => mapToDto(movie,ShortMovieDto)),
+      total,
       page,
       limit,
     };
@@ -67,14 +64,6 @@ export class MovieService {
   }
 
   private async checkError<T>(operation: () => Promise<T>, errorMessage: string): Promise<T> {
-    try {
-      return await operation();
-    } catch (error) {
-      throw new BadRequestException(errorMessage);
-    }
-  }
-
-  private async handleErrors<T>(operation: () => Promise<T>, errorMessage: string): Promise<T> {
     try {
       return await operation();
     } catch (error) {

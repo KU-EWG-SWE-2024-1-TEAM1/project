@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 import FileUpload from '@/app/components/editor/FileUpload/FileUpload';
@@ -14,9 +15,17 @@ const CreateMovie = () => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
     const [bigImgUrl, setBigImgUrl] = useState('');
     const [description, setDescription] = useState('');
+    const router = useRouter();
 
     const thumbnailRef = useRef(null);
     const bigImgRef = useRef(null);
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            router.push('/login');
+        }
+    }, [router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,10 +49,14 @@ const CreateMovie = () => {
         };
 
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movies`, movieData);
-            alert('Movie created successfully!');
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movies`, movieData, {
+                headers: {
+                    Authorization: `${localStorage.getItem('accessToken')}`
+                }
+            });
+            alert('Movie updated successfully!');
         } catch (error) {
-            console.error('Error creating movie:', error);
+            console.error('Error updating movie:', error);
         }
     };
 
@@ -56,9 +69,9 @@ const CreateMovie = () => {
     const youtubeID = extractYouTubeID(youtubeUrl);
 
     return (
-        <div className="container mx-auto my-40">
+        <div className="container mx-auto my-40 max-w-screen-xl">
             <form onSubmit={handleSubmit}>
-                <div className="mb-4">
+            <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
                     <input
                         type="text"

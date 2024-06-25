@@ -1,5 +1,5 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
-import { generatePresignedUrl } from '../../../utils/aws';
+import { generatePresignedUrl } from '@/app/utils/aws';
 
 const FileUpload = forwardRef(({ setFileUrl }, ref) => {
     const [selectedFile, setSelectedFile] = useState(null);

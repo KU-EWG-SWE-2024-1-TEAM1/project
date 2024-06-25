@@ -3,6 +3,6 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 export const corsOptions: CorsOptions = {
   origin: ['http://localhost:3000','https://www.moviemovit.xyz'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
   credentials: true,
 };

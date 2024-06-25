@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { Module } from '@nestjs/common';
+import {MiddlewareConsumer, Module, NestModule, RequestMethod} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getTypeOrmConfig } from './config/dbconfig';
@@ -12,6 +12,7 @@ import { PostModule } from "./modules/post/module";
 import { MovieModule } from "./modules/movie/module";
 import { CommentModule } from "./modules/comment/module";
 import { loadYamlConfig } from "./config/yamlConfig";
+import {RedirectMiddleware} from "./middleware/RedirectMiddleware";
 
 const ENV = process.env.NODE_ENV || 'dev';
 const configFilePath = `config/${ENV}.yaml`;
@@ -39,4 +40,10 @@ const config = loadYamlConfig(configFilePath);
   ],
 
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+        .apply(RedirectMiddleware)
+        .forRoutes({ path: '/', method: RequestMethod.ALL });
+  }
+}
