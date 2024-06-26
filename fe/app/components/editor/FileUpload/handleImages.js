@@ -1,10 +1,12 @@
-import { uploadBase64Image } from "@/app/components/editor/FileUpload/uploadVase64Image";
+import {uploadBase64Image} from "@/app/components/editor/FileUpload/uploadBase64Image";
 
 export const handleDescriptionImages = async (description, title) => {
     const base64Images = description.match(/<img[^>]+src="data:image\/[a-zA-Z]+;base64,[^"]+"[^>]*>/g) || [];
     const uploadPromises = base64Images.map(async (base64Image, index) => {
         const base64String = base64Image.match(/src="([^"]+)"/)[1];
-        const fileName = `${title.replace(/\s+/g, '_')}_${index + 1}.png`; // 글 제목을 기반으로 파일명 생성
+        const mimeType = base64String.match(/data:([^;]+);/)[1];
+        const extension = mimeType.split('/')[1]; // MIME 타입에서 확장자 추출
+        const fileName = `${title.replace(/\s+/g, '_')}_${index + 1}.${extension}`; // 파일명을 올바른 확장자로 생성
         return await uploadBase64Image(base64String, fileName);
     });
 
