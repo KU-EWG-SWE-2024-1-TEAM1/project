@@ -32,17 +32,16 @@ export class MovieService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ShortMovieDto>> {
-    const { page, limit, field, order } = paginationDto;
+    const { page = 1, limit = 10, field = 'id', order = 'ASC' } = paginationDto;
     const [movies, total] = await this.movieRepository.findPaginatedMovies(page, limit, field, order.toUpperCase() as 'ASC' | 'DESC');
 
     return {
-      data: movies.map(movie => mapToDto(movie,ShortMovieDto)),
+      data: movies.map(movie => mapToDto(movie, ShortMovieDto)),
       total,
       page,
       limit,
     };
   }
-
   async update(id: number, updateMovieDto: UpdateMovieDto): Promise<ResponseMovieDto> {
     const movie = await this.movieRepository.findById(id);
     this.ensureExists(movie, id);

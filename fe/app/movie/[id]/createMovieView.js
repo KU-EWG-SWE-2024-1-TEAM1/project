@@ -1,5 +1,6 @@
 import parse from 'html-react-parser';
 import YouTubeEmbed from "@/app/movie/[id]/youtube";
+import Image from "next/image";
 
 const CreateMovieView = ({ data }) => {
     const {
@@ -60,8 +61,15 @@ const CreateMovieView = ({ data }) => {
                 {thumbNailUrl && (
                     <div className="mt-20 flex  bg-gray-800 bg-opacity-50 p-4 rounded"
                          style={{fontSize: '1.5rem'}}>
-                        <img className="max-w-xs rounded-lg shadow-lg ml-40 mr-16"
-                             src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${thumbNailUrl}`} alt="Thumbnail"/>
+                        <Image
+                            className="max-w-xs rounded-lg shadow-lg ml-40 mr-16"
+                            src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${thumbNailUrl}`}
+                            alt="Thumbnail"
+                            layout="responsive"
+                            width={350}
+                            height={450}
+                            objectFit="cover"
+                        />
                         {movieInfo && (
                             <ul className="ml-8 space-y-4 text-left">
                                 {movieInfo.movieNm && <li><strong>영화 제목 :</strong> <span className="Do-Hyeon ml-32">{movieInfo.movieNm}</span></li>}
