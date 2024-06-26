@@ -2,11 +2,19 @@ import parse from 'html-react-parser';
 import YouTubeEmbed from "@/app/movie/[id]/youtube";
 
 const CreateMovieView = ({ data }) => {
-    const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description, movieInfo } = data;
+    const {
+        title = '데이터 없음',
+        youtubeUrl = '',
+        bigImgUrl = '',
+        thumbNailUrl = '',
+        description = '',
+        movieInfo = {}
+    } = data|| {};
 
-    const addCloudFrontUrl = (html) => {
-        return html.replace(/src="([^"]+)"/g, (match, p1) => {
-            if (!p1.startsWith('http')) {
+
+    const addCloudFrontUrl = (html = '') => {
+        return html.replace(/src="([^"]*)"/g, (match, p1) => {
+            if (p1 && !p1.startsWith('http')) {
                 return `src="${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${p1}"`;
             }
             return match;
@@ -14,9 +22,14 @@ const CreateMovieView = ({ data }) => {
     };
 
     const extractYouTubeID = (url) => {
-        const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[1].length === 11) ? match[1] : null;
+        try {
+            const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[1].length === 11) ? match[1] : null;
+        } catch (error) {
+            console.error('Error extracting YouTube ID:', error);
+            return null;
+        }
     };
 
     const updatedDescription = addCloudFrontUrl(description);
