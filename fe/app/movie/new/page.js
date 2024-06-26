@@ -49,12 +49,14 @@ const CreateMovie = () => {
         };
 
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movies`, movieData, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movies`, movieData, {
                 headers: {
                     Authorization: `${localStorage.getItem('accessToken')}`
                 }
             });
             alert('Movie updated successfully!');
+            const movieId = response.data.id;
+            window.location.href = `/movie/${movieId}`;
         } catch (error) {
             console.error('Error updating movie:', error);
         }

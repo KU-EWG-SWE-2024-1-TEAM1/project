@@ -2,11 +2,19 @@ import parse from 'html-react-parser';
 import YouTubeEmbed from "@/app/movie/[id]/youtube";
 
 const CreateMovieView = ({ data }) => {
-    const { title, youtubeUrl, bigImgUrl, thumbNailUrl, description, movieInfo } = data;
+    const {
+        title = '데이터 없음',
+        youtubeUrl = '',
+        bigImgUrl = '',
+        thumbNailUrl = '',
+        description = '',
+        movieInfo = {}
+    } = data|| {};
 
-    const addCloudFrontUrl = (html) => {
-        return html.replace(/src="([^"]+)"/g, (match, p1) => {
-            if (!p1.startsWith('http')) {
+
+    const addCloudFrontUrl = (html = '') => {
+        return html.replace(/src="([^"]*)"/g, (match, p1) => {
+            if (p1 && !p1.startsWith('http')) {
                 return `src="${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${p1}"`;
             }
             return match;
@@ -14,9 +22,14 @@ const CreateMovieView = ({ data }) => {
     };
 
     const extractYouTubeID = (url) => {
-        const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[1].length === 11) ? match[1] : null;
+        try {
+            const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[1].length === 11) ? match[1] : null;
+        } catch (error) {
+            console.error('Error extracting YouTube ID:', error);
+            return null;
+        }
     };
 
     const updatedDescription = addCloudFrontUrl(description);
@@ -25,7 +38,7 @@ const CreateMovieView = ({ data }) => {
 
     return (
         <div className="mt-8 p-4 bg-transparent text-white shadow-md rounded-md relative">
-            <h2 className="mt-10 mb-6 text-7xl font-bold text-center z-20 relative">{title}</h2>
+            <h2 className="mt-10 mb-6 text-7xl font-bold text-center z-20 relative Do-Hyeon">{title}</h2>
             <div className="relative mb-4" style={{
                 backgroundImage: `url(${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${bigImgUrl})`,
                 backgroundSize: 'cover',
@@ -45,17 +58,28 @@ const CreateMovieView = ({ data }) => {
                  style={{ minHeight: '50vh', marginTop: '4rem', height: 'auto' }}>
                 {parse(updatedDescription)}
                 {thumbNailUrl && (
-                    <div className="mt-20 flex justify-center items-center bg-gray-800 bg-opacity-50 p-4 rounded"  style={{fontSize: '1.5rem'}}>
-                        <img className="max-w-xs rounded-lg shadow-lg mr-4"
+                    <div className="mt-20 flex  bg-gray-800 bg-opacity-50 p-4 rounded"
+                         style={{fontSize: '1.5rem'}}>
+                        <img className="max-w-xs rounded-lg shadow-lg ml-40 mr-16"
                              src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${thumbNailUrl}`} alt="Thumbnail"/>
                         {movieInfo && (
-                            <ul className="ml-4 space-y-2 text-left">
-                                {movieInfo.movieNm && <li><strong>영화 제목:</strong> {movieInfo.movieNm}</li>}
-                                {movieInfo.movieNmEn && <li><strong>영문 제목:</strong> {movieInfo.movieNmEn}</li>}
-                                {movieInfo.prdtYear && <li><strong>제작 연도:</strong> {movieInfo.prdtYear}</li>}
-                                {movieInfo.openDt && <li><strong>개봉 연도:</strong> {movieInfo.openDt}</li>}
-                                {movieInfo.genreNm && <li><strong>장르:</strong> {movieInfo.genreNm}</li>}
-                                {movieInfo.showTm && <li><strong>상영 시간:</strong> {movieInfo.showTm} 분</li>}
+                            <ul className="ml-8 space-y-4 text-left">
+                                {movieInfo.movieNm && <li><strong>영화 제목 :</strong> <span className="Do-Hyeon ml-32">{movieInfo.movieNm}</span></li>}
+                                {movieInfo.movieNmEn && <li><strong>영문 제목 :</strong> <span className="Do-Hyeon ml-32">{movieInfo.movieNmEn}</span></li>}
+                                {movieInfo.prdtYear && <li><strong>제작 연도 :</strong> <span className="Do-Hyeon ml-32">{movieInfo.prdtYear}</span></li>}
+                                {movieInfo.openDt && <li><strong>개봉 연도 :</strong>  <span className="Do-Hyeon ml-32">{movieInfo.openDt}</span></li>}
+                                {movieInfo.genreNm && <li><strong>장르 :</strong>  <span className="Do-Hyeon ml-32">{movieInfo.genreNm}</span></li>}
+                                {movieInfo.showTm && <li><strong>상영 시간 :</strong>  <span className="Do-Hyeon ml-32">{movieInfo.showTm} 분</span></li>}
+                                {movieInfo.actors && movieInfo.actors.length > 0 && (
+                                    <li>
+                                        <strong>출연진 :</strong>
+                                        <ul className="ml-40 space-y-2">
+                                            {movieInfo.actors.map((actor, index) => (
+                                                <li key={index} className="Nanum-Pen-Script">{actor.peopleNm}</li>
+                                            ))}
+                                        </ul>
+                                    </li>
+                                )}
                             </ul>
                         )}
                     </div>

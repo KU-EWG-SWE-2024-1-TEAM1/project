@@ -10,11 +10,17 @@ const fetchMovieData = async (id) => {
         let movieInfo = null;
         try {
             const url = `http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=${apiKey}&movieNm=${movie.title}`;
-            console.log(movie.title)
             const searchResponse = await axios.get(url);
             const movies = searchResponse.data.movieListResult.movieList;
             if (movies && movies.length > 0) {
                 movieInfo = movies.find(movie => movie.movieNm === title) || movies[0];
+
+                const movieCd = movieInfo.movieCd;
+                const detailUrl = `http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=${apiKey}&movieCd=${movieCd}`;
+                const detailResponse = await axios.get(detailUrl);
+                const movieDetails = detailResponse.data.movieInfoResult.movieInfo;
+
+                movieInfo.actors = movieDetails.actors;
             }
         } catch (error) {
             console.error('No matching movie data:', error);
