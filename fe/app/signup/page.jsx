@@ -61,7 +61,6 @@ const SignUp = () => {
     }
     try {
       const result = await signupApi(inputs);
-      console.log('회원가입 성공:', result);
       router.push("/login");
     } catch (error) {
       setErrorMessage('회원가입 실패: ' + error.message);
