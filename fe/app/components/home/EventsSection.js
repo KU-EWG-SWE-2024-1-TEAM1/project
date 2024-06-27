@@ -7,34 +7,32 @@ import Image from "next/image";
 const EventsSection = () => {
     const [previews, setPreviews] = useState([]);
     const [goods, setGoods] = useState([]);
+    const [sortOption, setSortOption] = useState('id'); // 기본순으로 초기 설정
     const router = useRouter();
 
     useEffect(() => {
-        const fetchPreviews = async () => {
-            try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/posts/preview`, {
-                    params: { page: 1, limit: 4 }
-                });
-                setPreviews(response.data.data);
-            } catch (error) {
-                console.error('Error fetching previews:', error);
-            }
-        };
+        fetchEvents();
+    }, [sortOption]);
 
-        const fetchGoods = async () => {
-            try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/posts/goods`, {
-                    params: { page: 1, limit: 4 }
-                });
-                setGoods(response.data.data);
-            } catch (error) {
-                console.error('Error fetching goods:', error);
-            }
-        };
+    const fetchEvents = async () => {
+        try {
+            const previewResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/posts/preview`, {
+                params: { page: 1, limit: 4, field: sortOption }
+            });
+            setPreviews(previewResponse.data.data);
 
-        fetchPreviews();
-        fetchGoods();
-    }, []);
+            const goodsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/posts/goods`, {
+                params: { page: 1, limit: 4, field: sortOption }
+            });
+            setGoods(goodsResponse.data.data);
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    };
+
+    const handleSortChange = (option) => {
+        setSortOption(option);
+    };
 
     const handleClick = (id) => {
         router.push(`/post/${id}`);
@@ -43,7 +41,19 @@ const EventsSection = () => {
     return (
         <div className="min-h-[80vh] py-12 bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url(/back.webp)'}}>
             <div className="max-w-6xl mx-auto ">
-                <h2 className="mt-14 text-3xl font-bold mb-6 text-gold gradient-text text-left">시사회</h2>
+                <div className="mt-10 flex justify-end space-x-4 mb-6 Nanum-Myeongjo">
+                    {['id', 'views', 'score'].map(option => (
+                        <button
+                            key={option}
+                            onClick={() => handleSortChange(option)}
+                            className={`text-lg font-semibold ${sortOption === option ? 'text-yellow-400' : 'text-white'} hover:text-yellow-100 transition`}
+                        >
+                            {option === 'id' ? '기본순' : option === 'views' ? '조회순' : '평점순'}
+                        </button>
+                    ))}
+                </div>
+
+                <h2 className="mt-5 text-3xl font-bold mb-6 text-gold gradient-text text-left">시사회</h2>
                 <div className="space-y-6">
                     <div className="flex flex-col mt-10 mb-10 lg:flex-row justify-start space-y-4 lg:space-y-0 lg:space-x-4 ">
                         {previews.map((event) => (
