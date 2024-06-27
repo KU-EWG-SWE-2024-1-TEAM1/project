@@ -37,6 +37,39 @@ const EventsSection = () => {
     const handleClick = (id) => {
         router.push(`/post/${id}`);
     };
+    const renderStars = (score) => {
+        const fullStars = Math.floor(score);
+        const halfStar = score % 1 >= 0.5 ? 1 : 0;
+        const emptyStars = 5 - fullStars - halfStar;
+
+        const stars = [];
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<span key={`full-${i}`} className="gradient-text">★</span>);
+        }
+
+        if (halfStar) {
+            stars.push(<span key="half" className="text-yellow-400">☆</span>);
+        }
+
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(<span key={`empty-${i}`} className="text-gray-400">★</span>);
+        }
+
+        return stars;
+    };
+
+    const renderEventInfo = (event) => {
+        if (sortOption === 'views') {
+            return <span className="absolute top-64 left-12  bg-opacity-75 text-white p-2 gradient-text">{event.views} views</span>;
+        } else if(sortOption === 'score')
+        return (
+            <div className="absolute top-64 left-12 bg-opacity-75 p-2 ">
+                {renderStars(event.score)}
+            </div>
+        );
+        return null;
+    };
 
     return (
         <div className="min-h-[80vh] py-12 bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url(/back.webp)'}}>
@@ -68,6 +101,7 @@ const EventsSection = () => {
                                 }}
                                 onClick={() => handleClick(event.id)}
                             >
+                                {renderEventInfo(event)}
                                 <div style={{
                                     boxShadow: '0 0 10px 3px gold, 0 0 20px 6px goldenrod, 0 0 30px 9px darkgoldenrod',
                                     padding: '5px',
@@ -104,6 +138,7 @@ const EventsSection = () => {
                                 }}
                                 onClick={() => handleClick(event.id)}
                             >
+                                {renderEventInfo(event)}
                                 <div style={{
                                     boxShadow: '0 0 10px 3px gold, 0 0 20px 6px goldenrod, 0 0 30px 9px darkgoldenrod',
                                     padding: '5px',

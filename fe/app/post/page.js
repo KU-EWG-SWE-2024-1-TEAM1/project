@@ -28,7 +28,7 @@ const PostsPage = () => {
         };
 
         fetchPosts();
-    }, [sortOption]);
+    }, [page,sortOption]);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
