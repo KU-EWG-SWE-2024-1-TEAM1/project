@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from '../entity/Post';
-import { PostPostDto, UpdatePostDto, ResponsePostDto } from '../dto/PostDto';
+import {PostPostDto, UpdatePostDto, ResponsePostDto, ShortPostDto} from '../dto/PostDto';
 import { paginate, PaginationResult } from '../../../utils/pagination/pagination';
 import { PaginationDto } from '../../../utils/pagination/paginationDto';
 import { mapToDto } from "../../../utils/mapper/Mapper";
@@ -40,7 +40,7 @@ export class PostService {
     return mapToDto(post,ResponsePostDto);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ResponsePostDto>> {
+  async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ShortPostDto>> {
     const { page, limit, field, order } = paginationDto;
     const result = await this.handleErrors(
       () => paginate(this.postRepository, { page, limit, field, order }, { relations: ['user'] }),
@@ -48,7 +48,19 @@ export class PostService {
     );
 
     return {
-      data: result.data.map(post => mapToDto(post,ResponsePostDto)),
+      data: result.data.map(post => mapToDto(post,ShortPostDto)),
+      total: result.total,
+      page,
+      limit,
+    };
+  }
+
+  async findAllWhereType(paginationDto: PaginationDto, type: string): Promise<PaginationResult<ShortPostDto>> {
+    const { page=1, limit=10, field='id', order='DESC' } = paginationDto;
+    const result = await this.postRepository.findPaginatedPostsByType(page, limit, field, order.toUpperCase() as 'ASC' | 'DESC', type);
+
+    return {
+      data: result.data.map(post => mapToDto(post, ShortPostDto)),
       total: result.total,
       page,
       limit,

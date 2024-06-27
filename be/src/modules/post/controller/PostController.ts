@@ -14,7 +14,7 @@ import {
   Request
 } from "@nestjs/common";
 import { PostService } from '../service/PostService';
-import { PostPostDto, ResponsePostDto, UpdatePostDto } from '../dto/PostDto';
+import {PostPostDto, ResponsePostDto, ShortPostDto, UpdatePostDto} from '../dto/PostDto';
 import { PaginationResult } from '../../../utils/pagination/pagination';
 import { PaginationDto } from '../../../utils/pagination/paginationDto';
 import { AuthGuard } from "../../../auth/JwtAuthGuard/JwtAuthGuard";
@@ -28,10 +28,18 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
-  @UseGuards(AuthGuard,RolesGuard)
-  @Roles(Role.Admin,Role.User)
-  async findAll(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ResponsePostDto>> {
+  async findAll(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ShortPostDto>> {
     return this.postService.findAll(paginationDto);
+  }
+
+  @Get('preview')
+  async findAllWherePreview(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ShortPostDto>> {
+    return this.postService.findAllWhereType(paginationDto, '시사회');
+  }
+
+  @Get('goods')
+  async findAllWhereGoods(@Query() paginationDto: PaginationDto): Promise<PaginationResult<ShortPostDto>> {
+    return this.postService.findAllWhereType(paginationDto, '굿즈샵');
   }
 
   @Post()
