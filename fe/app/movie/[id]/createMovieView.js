@@ -68,7 +68,6 @@ const CreateMovieView = ({ data }) => {
                             layout="responsive"
                             width={350}
                             height={450}
-                            objectFit="cover"
                         />
                         {movieInfo && (
                             <ul className="ml-8 space-y-4 text-left">
@@ -82,7 +81,7 @@ const CreateMovieView = ({ data }) => {
                                     <li>
                                         <strong>출연진 :</strong>
                                         <ul className="ml-40 space-y-2">
-                                            {movieInfo.actors.map((actor, index) => (
+                                            {movieInfo.actors.slice(0, 5).map((actor, index) => (
                                                 <li key={index} className="Nanum-Pen-Script">{actor.peopleNm}</li>
                                             ))}
                                         </ul>
@@ -93,6 +92,7 @@ const CreateMovieView = ({ data }) => {
                     </div>
                 )}
             </div>
+            
         </div>
     );
 };

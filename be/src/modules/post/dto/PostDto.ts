@@ -18,10 +18,9 @@ export class PostPostDto {
   @IsString()
   thumbnailURL: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  photosURL?: string[];
+  @IsString()
+  type: string;
+
 }
 
 export class UpdatePostDto {
@@ -33,14 +32,6 @@ export class UpdatePostDto {
   @IsString()
   content?: string;
 
-  @IsOptional()
-  @IsString()
-  thumbnailURL?: string;
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  photosURL?: string[];
 }
 
 
@@ -73,8 +64,10 @@ export class ResponsePostDto {
   thumbnailURL: string;
 
   @Field
-  photosURL?: string[];
+  views: number;
 
+  @Field
+  type: string;
 }
 
 export class ShortPostDto{

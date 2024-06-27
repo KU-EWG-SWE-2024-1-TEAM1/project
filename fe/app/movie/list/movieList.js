@@ -35,19 +35,17 @@ const MovieList = () => {
     return (
         <div className="container mx-auto">
             <h1 className="mt-32 text-6xl font-bold mb-4 text-white text-center Do-Hyeon" >Movie List</h1>
-            <div className="mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="mt-20 grid grid-cols-1 sm:grid-cols-4 gap-4">
                 {movies.map(movie => (
                     <Link href={`/movie/${movie.id}`} key={movie.id}>
                         <div className="mb-5 bg-gray-800 bg-opacity-50 p-4 rounded-lg text-center transition-transform transform hover:scale-105 hover:bg-opacity-75 cursor-pointer">
-                            <div className="relative w-full h-auto mb-2 filter brightness-80 saturate-50 hover:brightness-100 hover:saturate-100 transition-all duration-300">
+                            <div className="relative w-full h-full mb-2 filter brightness-80 saturate-50 hover:brightness-100 hover:saturate-100 transition-all duration-300">
                                 <Image
                                     src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${movie.thumbNailUrl}`}
                                     alt="Thumbnail"
                                     layout="responsive"
                                     width={350}
                                     height={450}
-                                    objectFit="cover"
-                                    className="mx-auto"
                                 />
                                 <h2 className="text-lg font-semibold text-white mt-2 Nanum-Gothic">{movie.title}</h2>
                             </div>

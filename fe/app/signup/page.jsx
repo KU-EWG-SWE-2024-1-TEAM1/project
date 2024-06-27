@@ -68,69 +68,69 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-[350px]">
-        {/* <header>Sign Up</header> */}
-        <Logo width={200} height={76} />
-        <form onSubmit={handleSignUp} className="flex flex-col justify-center">
-          <InputForm
-            label="NAME"
-            type="text"
-            name="name"
-            placeholder="name"
-            value={inputs.name}
-            onChange={handleChange}
-          />
-          <InputForm
-            label="EMAIL"
-            type="email"
-            name="email"
-            placeholder="moving@movie.com"
-            value={inputs.email}
-            onChange={handleChange}
-          />
-          <InputForm
-            label="NICKNAME"
-            type="text"
-            name="nickname"
-            placeholder="nickname"
-            value={inputs.nickname}
-            onChange={handleChange}
-          />
-          <InputForm
-            label="PASSWORD"
-            type="password"
-            name="password"
-            placeholder="●●●●●●●●"
-            value={inputs.password}
-            onChange={handleChange}
-          />
-          <InputForm
-            label="CONFIRM PASSWORD"
-            type="password"
-            name="confirmPassword"
-            placeholder="●●●●●●●●"
-            value={inputs.confirmPassword}
-            onChange={handleChange}
-          />
-          {errorMessage && (
-            <span className="flex justify-center text-sm text-red-500">
-              {errorMessage}
-            </span>
-          )}
-          <Button type="submit">
-            SIGN UP
-          </Button>
-        </form>
-
-        <Link
-          href={"/login"}
-          className="block w-full mt-4 text-center text-sm border border-primary hover:bg-primary hover:text-textActive rounded-lg py-1 px-3 transition duration-300 ease-in-out"
-        >
-          LOGIN
-        </Link>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 bg-cover bg-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-[350px]  transition duration-300 ease-in-out border-4 border-gray-950 hover:border-gray-400">
+          <div className="flex justify-center mb-4">
+            <Logo width={200} height={76} />
+          </div>
+          <form onSubmit={handleSignUp} className="flex flex-col space-y-4">
+            <InputForm
+                label="NAME"
+                type="text"
+                name="name"
+                placeholder="성함을 입력해주세요"
+                value={inputs.name}
+                onChange={handleChange}
+            />
+            <InputForm
+                label="EMAIL"
+                type="email"
+                name="email"
+                placeholder="moving@movie.com"
+                value={inputs.email}
+                onChange={handleChange}
+            />
+            <InputForm
+                label="NICKNAME"
+                type="text"
+                name="nickname"
+                placeholder="닉네임을 입력해주세요"
+                value={inputs.nickname}
+                onChange={handleChange}
+            />
+            <InputForm
+                label="PASSWORD"
+                type="password"
+                name="password"
+                placeholder="비밀번호는 8글자 이상이어야 합니다."
+                value={inputs.password}
+                onChange={handleChange}
+            />
+            <InputForm
+                label="CONFIRM PASSWORD"
+                type="password"
+                name="confirmPassword"
+                placeholder="비밀번호와 일치해야 합니다."
+                value={inputs.confirmPassword}
+                onChange={handleChange}
+            />
+            {errorMessage && (
+                <span className="text-center text-sm text-red-500">
+                            {errorMessage}
+                        </span>
+            )}
+            <Button type="submit" className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              SIGN UP
+            </Button>
+          </form>
+          <Link
+              href={"/login"}
+              className="block w-full mt-4 text-center text-sm border border-primary text-primary rounded-lg py-1 px-3 hover:bg-primary hover:text-white transition duration-300 ease-in-out"
+          >
+            LOGIN
+          </Link>
+        </div>
       </div>
-    </div>
   );
 };
 
