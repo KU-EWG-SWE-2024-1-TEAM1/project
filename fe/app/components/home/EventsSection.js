@@ -61,10 +61,10 @@ const EventsSection = () => {
 
     const renderEventInfo = (event) => {
         if (sortOption === 'views') {
-            return <span className="absolute top-64 left-12  bg-opacity-75 text-white p-2 gradient-text">{event.views} views</span>;
+            return <span className="z-50 Do-Hyeon absolute top-64 left-12  bg-opacity-75 text-white p-2 gradient-text">{event.views} views</span>;
         } else if(sortOption === 'score')
         return (
-            <div className="absolute top-64 left-12 bg-opacity-75 p-2 ">
+            <div className="z-50 Do-Hyeon absolute top-64 left-12 bg-opacity-75 p-2 ">
                 {renderStars(event.score)}
             </div>
         );
