@@ -1,5 +1,5 @@
 'use client'
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import FileUpload from "@/app/components/editor/FileUpload/FileUpload";
@@ -32,7 +32,7 @@ const NewPost = ({ params }) => {
 
         const postData = {
             title,
-            content,
+            content: convertNewlinesToHtml(content),
             movieId: id,
             thumbnailURL: `${uploadedThumbnailUrl}`,
             type,
@@ -49,8 +49,8 @@ const NewPost = ({ params }) => {
             router.push(`/post/${postId}`);
         }
         catch (error) {
-                console.error('Error creating post:', error);
-                alert('Failed to create post.');
+            console.error('Error creating post:', error);
+            alert('Failed to create post.');
         }
     };
 
@@ -87,7 +87,7 @@ const NewPost = ({ params }) => {
 
                 <div className="mb-4">
                     <label htmlFor="thumbnailURL" className="block text-sm font-medium text-white">Thumbnail URL</label>
-                    <FileUpload setFileUrl={setThumbnailURL} ref={thumbnailRef}  className="text-white"/>
+                    <FileUpload setFileUrl={setThumbnailURL} ref={thumbnailRef} className="text-white" />
                 </div>
 
                 <div className="mb-4">
@@ -97,7 +97,7 @@ const NewPost = ({ params }) => {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         className="w-full bg-transparent text-white border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                        style={{height: "60vh"}}
+                        style={{ height: "60vh" }}
                         required
                     />
                 </div>
