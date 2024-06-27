@@ -80,16 +80,19 @@ const PostPage = ({ params }) => {
                     src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${post.thumbnailURL}`}
                     alt="Thumbnail"
                     layout="intrinsic"
-                    width={500}
-                    height={300}
+                    width={250}
+                    height={350}
                     className="rounded-lg shadow-lg"
                 />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="md:col-span-2">
-                    <p className="text-lg leading-relaxed">{post.content}</p>
-                </div>
-                <div>
+                    <p className="text-lg leading-relaxed"
+                    style={{whiteSpace: 'pre-line'}}>
+                        {post.content}
+                </p>
+            </div>
+            <div>
                     <h2 className="text-2xl font-semibold mb-2">Movie:</h2>
                     <div className="flex items-center mb-4">
                         <Image
