@@ -68,8 +68,8 @@ const SignUp = () => {
   };
 
   return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 bg-cover bg-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-[350px]  transition duration-300 ease-in-out border-4 border-gray-950 hover:border-gray-400">
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="bg-gray-100 opacity-95 p-8 rounded-lg shadow-lg w-[350px]  transition duration-300 ease-in-out border-4 border-gray-950 hover:border-gray-400 hover:opacity-100">
           <div className="flex justify-center mb-4">
             <Logo width={200} height={76} />
           </div>

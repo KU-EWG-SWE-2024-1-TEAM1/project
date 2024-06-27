@@ -53,7 +53,7 @@ const LogIn = () => {
 
   return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-[350px]">
+        <div className="bg-gray-100 opacity-95 p-8 rounded-lg shadow-lg w-[350px] border-4 border-gray-950 hover:border-gray-400 hover:opacity-100 transition duration-300">
           <Logo width={200} height={76} />
           <form onSubmit={handleLogin} className="flex flex-col justify-center">
             <InputForm

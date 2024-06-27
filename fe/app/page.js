@@ -1,6 +1,5 @@
 import VideoPlayer from "@/app/components/home/VideoPlayer";
 import EventsSection from "@/app/components/home/EventsSection";
-import events from "@/app/components/home/eventdata";
 export default function Home() {
     return (
         <div className="text-white">
