@@ -23,11 +23,14 @@ export class Post extends BaseEntity{
   @Column('text')
   content: string;
 
+  @Column({ length: 255, default:'' })
+  type: string;
+
   @Column({ default: 0 })
   score: number;
 
   @Column({ default: 0 })
-  view: number;
+  views: number;
 
   @Column({ length: 255, nullable: true })
   thumbnailURL: string;

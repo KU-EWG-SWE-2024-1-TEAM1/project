@@ -35,6 +35,8 @@ export class PostService {
   async findOne(id: number): Promise<ResponsePostDto> {
     const post = await this.postRepository.findById(id);
     this.ensureExists(post, id);
+    post.views++;
+    await this.postRepository.save(post);
     return mapToDto(post,ResponsePostDto);
   }
 
