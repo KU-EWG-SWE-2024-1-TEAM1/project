@@ -25,7 +25,7 @@ export default function Home() {
                     </p>
                 </div>
             </div>
-            <EventsSection events={events}/>
+            <EventsSection/>
         </div>
     );
 }
