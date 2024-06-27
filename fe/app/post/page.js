@@ -9,13 +9,14 @@ const PostsPage = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
+    const [sortOption, setSortOption] = useState('id');
     const limit = 10;
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/posts`, {
-                    params: { page, limit }
+                    params: { page, limit, field: sortOption }
                 });
                 setPosts(response.data.data);
                 setTotal(response.data.total);
@@ -27,7 +28,7 @@ const PostsPage = () => {
         };
 
         fetchPosts();
-    }, [page]);
+    }, [sortOption]);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
@@ -39,7 +40,27 @@ const PostsPage = () => {
 
     return (
         <div className="container mx-auto mt-32 p-6">
-            <h1 className="text-4xl font-bold mb-6 text-center text-white">Posts</h1>
+            <h1 className="text-4xl font-bold mb-6 text-center text-white">Movie Events</h1>
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={() => setSortOption('id')}
+                    className={`px-4 py-2 mx-2 rounded-md ${sortOption === 'id' ? 'bg-blue-950 text-white' : 'bg-transparent text-gray-200'}`}
+                >
+                    기본순
+                </button>
+                <button
+                    onClick={() => setSortOption('views')}
+                    className={`px-4 py-2 mx-2 rounded-md ${sortOption === 'views' ? 'bg-blue-950 text-white' : 'bg-transparent text-gray-200'}`}
+                >
+                    조회순
+                </button>
+                <button
+                    onClick={() => setSortOption('score')}
+                    className={`px-4 py-2 mx-2 rounded-md ${sortOption === 'score' ? 'bg-blue-950 text-white' : 'bg-transparent text-gray-200'}`}
+                >
+                    평점순
+                </button>
+            </div>
             {loading ? (
                 <div className="text-center text-white">Loading...</div>
             ) : (
@@ -85,4 +106,3 @@ const PostsPage = () => {
 };
 
 export default PostsPage;
-

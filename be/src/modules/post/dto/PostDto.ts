@@ -70,11 +70,15 @@ export class ResponsePostDto {
   type: string;
 }
 
-export class ShortPostDto{
+export class ShortPostDto {
   @Field
   id: number;
   @Field
   title: string;
   @Field
-  thumbnailURL: string
+  thumbnailURL: string;
+  @Field
+  views: number;
+  @Field
+  score: number;
 }
