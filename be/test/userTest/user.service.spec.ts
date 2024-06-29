@@ -5,6 +5,8 @@ import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { PostUserDto, UpdateUserDto } from "../../src/modules/user/dto/UserDto";
 import { User } from "../../src/modules/user/entity/User";
 import { Role } from "../../src/auth/authorization/Role";
+import { Post } from "../../src/modules/post/entity/Post";
+import { Comment } from "../../src/modules/comment/entity/Comment";
 
 const mockUserRepository = () => ({
   create: jest.fn(),
@@ -25,12 +27,12 @@ const mockUser: User = {
   salt: 'salt',
   role: Role.Admin,
   hashPassword: jest.fn(),
-  posts: [],
-  comments: [],
+  posts: [jest.fn() as unknown as Post],
+  comments: [jest.fn() as unknown as Comment],
 };
 
 describe('UserService', () => {
-  let userService: UserService;
+  let userService;
   let userRepository;
 
   beforeEach(async () => {
@@ -49,27 +51,56 @@ describe('UserService', () => {
     it('should create a user successfully', async () => {
       userRepository.create.mockReturnValue(mockUser);
       userRepository.save.mockResolvedValue(mockUser);
-      userRepository.findOne.mockResolvedValue(null);
+      userRepository.findOne.mockResolvedValue(null); // Ensure email does not exist
 
-      const postUserDto: PostUserDto = { name: 'Test User',nickname: 'Test Nickname', email: 'test@example.com', password: 'password' };
+      const postUserDto: PostUserDto = {
+        name: 'Test User',
+        nickname: 'Test Nickname',
+        email: 'test@example.com',
+        password: 'password'
+      };
+
       const result = await userService.create(postUserDto);
 
       expect(userRepository.create).toHaveBeenCalledWith(postUserDto);
       expect(userRepository.save).toHaveBeenCalledWith(mockUser);
-      expect(result).toEqual({
-        id: 1,
-        name: 'Test User',
-        nickname: 'Test Nickname',
-        email: 'test@example.com',
-      });
+
+      expect(result.id).toEqual(1);
+      expect(result.name).toEqual('Test User');
+      expect(result.nickname).toEqual('Test Nickname');
+      expect(result.email).toEqual('test@example.com');
     });
 
     it('should throw an error if email already exists', async () => {
       userRepository.findOne.mockResolvedValue(mockUser);
 
-      const postUserDto: PostUserDto = { name: 'Test User',nickname: 'Test Nickname', email: 'test@example.com', password: 'password' };
+      const postUserDto: PostUserDto = {
+        name: 'Test User',
+        nickname: 'Test Nickname',
+        email: 'test@example.com',
+        password: 'password'
+      };
 
-      await expect(userService.create(postUserDto)).rejects.toThrow(BadRequestException);
+      await expect(userService.create(postUserDto))
+          .rejects
+          .toThrow(new BadRequestException(`Email ${postUserDto.email} already exists`));
+    });
+
+    it('should indicate the method where the error occurred', async () => {
+      userRepository.create.mockReturnValue(mockUser);
+      userRepository.findOne.mockResolvedValue(null);
+      userRepository.save.mockRejectedValue(new Error('Database error'));
+
+      const postUserDto: PostUserDto = {
+        name: 'Test User',
+        nickname: 'Test Nickname',
+        email: 'test@example.com',
+        password: 'password'
+      };
+
+      await expect(userService.create(postUserDto))
+          .rejects
+          .toThrow(new BadRequestException('Failed to create user'));
     });
   });
 

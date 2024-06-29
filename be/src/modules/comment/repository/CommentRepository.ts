@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
+import {DataSource, FindManyOptions, FindOptionsWhere, Repository} from "typeorm";
 import {Comment} from "../entity/Comment";
+
 
 @Injectable()
 export class CommentRepository extends Repository<Comment> {
@@ -8,20 +9,21 @@ export class CommentRepository extends Repository<Comment> {
     super(Comment, dataSource.createEntityManager());
   }
 
-  async findByPostId(postId: number):  Promise<Comment[]>{
-    return this.find({
-      where: { post: { id: postId } },
+  async findByPostId(postId: number): Promise<Comment[]> {
+    const options: FindManyOptions<Comment> = {
+      where: { post: { id: postId } } as FindOptionsWhere<Comment>,
       relations: ['user', 'post'],
-    });
+    };
+    return this.find(options);
   }
 
   async findByUserId(userId: number): Promise<Comment[]> {
-    return this.find({
-      where: { user: { id: userId } },
+    const options: FindManyOptions<Comment> = {
+      where: { user: { id: userId } } as FindOptionsWhere<Comment>,
       relations: ['user', 'post'],
-    });
+    };
+    return this.find(options);
   }
-
   async findById(id: number): Promise<Comment | undefined> {
     return this.findOne({
       where: { id },

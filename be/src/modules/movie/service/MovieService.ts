@@ -33,14 +33,17 @@ export class MovieService {
 
   async findAll(paginationDto: PaginationDto): Promise<PaginationResult<ShortMovieDto>> {
     const { page = 1, limit = 10, field = 'id', order = 'ASC' } = paginationDto;
-    const [movies, total] = await this.movieRepository.findPaginatedMovies(page, limit, field, order.toUpperCase() as 'ASC' | 'DESC');
-
-    return {
-      data: movies.map(movie => mapToDto(movie, ShortMovieDto)),
-      total,
-      page,
-      limit,
-    };
+    try {
+      const [movies, total] = await this.movieRepository.findPaginatedMovies(page, limit, field, order.toUpperCase() as 'ASC' | 'DESC');
+      return {
+        data: movies.map(movie => mapToDto(movie, ShortMovieDto)),
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch movies');
+    }
   }
   async update(id: number, updateMovieDto: UpdateMovieDto): Promise<ResponseMovieDto> {
     const movie = await this.movieRepository.findById(id);
@@ -51,7 +54,7 @@ export class MovieService {
   }
 
   async remove(id: number): Promise<void> {
-    const movie = await this.movieRepository.findOne({ where: { id } });
+    const movie = await this.movieRepository.findById(id);
     this.ensureExists(movie, id);
     await this.checkError(() => this.movieRepository.delete(id), 'Failed to delete movie');
   }

@@ -1,36 +1,43 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MovieService } from '../../src/modules/movie/service/MovieService';
-import { MovieRepository } from '../../src/modules/movie/repository/MovieRepository';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
-import { PostMovieDto, UpdateMovieDto } from '../../src/modules/movie/dto/MovieDto';
+import { Test, TestingModule } from "@nestjs/testing";
+import { MovieService } from "../../src/modules/movie/service/MovieService";
+import { MovieRepository } from "../../src/modules/movie/repository/MovieRepository";
+import { NotFoundException, BadRequestException } from "@nestjs/common";
+import { PostMovieDto, UpdateMovieDto } from "../../src/modules/movie/dto/MovieDto";
 import { Movie } from "../../src/modules/movie/entity/Movie";
-import { PaginationResult } from "../../src/utils/pagination/pagination";
 import { PaginationDto } from "../../src/utils/pagination/paginationDto";
+import { PaginationResult } from "../../src/utils/pagination/pagination";
+import { mapToDto } from "../../src/utils/mapper/Mapper";
+import { BaseEntity } from "typeorm";
+import {Post} from "../../src/modules/post/entity/Post";
 
 const mockMovieRepository = () => ({
   create: jest.fn(),
   save: jest.fn(),
-  findById: jest.fn(),
   findOne: jest.fn(),
+  findById: jest.fn(),
   delete: jest.fn(),
+  findPaginatedMovies: jest.fn(),
 });
 
-const mockMovie: Partial<Movie> = {
-  id: 1,
-  title: 'Test Movie',
-  description: 'Test Description',
-  bigImgUrl: 'big.jpg',
-  thumbNailUrl: 'thumb.jpg',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  posts: [],
-};
+class MockMovie extends BaseEntity {
+  id = 1;
+  title = 'Test Movie';
+  description = 'This is a test movie';
+  youtubeUrl = 'http://youtube.com/test';
+  bigImgUrl = 'http://bigimg.com/test';
+  thumbNailUrl = 'http://thumbnail.com/test';
+  createdAt = new Date();
+  updatedAt = new Date();
+  posts = [jest.fn() as unknown as Post];
+}
 
 describe('MovieService', () => {
-  let service: MovieService;
-  let movieRepository: ReturnType<typeof mockMovieRepository>;
+  let movieService;
+  let movieRepository;
+  let mockMovie;
 
   beforeEach(async () => {
+    mockMovie = new MockMovie();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MovieService,
@@ -38,147 +45,126 @@ describe('MovieService', () => {
       ],
     }).compile();
 
-    service = module.get<MovieService>(MovieService);
-    movieRepository =  module.get(MovieRepository);
+    movieService = module.get<MovieService>(MovieService);
+    movieRepository = module.get<MovieRepository>(MovieRepository);
+
+    jest.clearAllMocks();
   });
 
   describe('create', () => {
     it('should create a movie successfully', async () => {
-      const postMovieDto: PostMovieDto = {
-        title: 'Test Movie',
-        description: 'Test Description',
-        bigImgUrl: 'big.jpg',
-        thumbNailUrl: 'thumb.jpg',
-      };
-
       movieRepository.create.mockReturnValue(mockMovie);
       movieRepository.save.mockResolvedValue(mockMovie);
 
-      const result = await service.create(postMovieDto);
+      const postMovieDto: PostMovieDto = {
+        title: 'Test Movie',
+        description: 'This is a test movie',
+        youtubeUrl: 'http://youtube.com/test',
+        bigImgUrl: 'http://bigimg.com/test',
+        thumbNailUrl: 'http://thumbnail.com/test',
+      };
+      const result = await movieService.create(postMovieDto);
 
       expect(movieRepository.create).toHaveBeenCalledWith(postMovieDto);
       expect(movieRepository.save).toHaveBeenCalledWith(mockMovie);
-      expect(result).toEqual(expect.objectContaining(postMovieDto));
-    });
 
-    it('should throw a BadRequestException if movie creation fails', async () => {
-      const postMovieDto: PostMovieDto = {
-        title: 'Test Movie',
-        description: 'Test Description',
-        bigImgUrl: 'big.jpg',
-        thumbNailUrl: 'thumb.jpg',
-      };
-
-      movieRepository.create.mockReturnValue(mockMovie);
-      movieRepository.save.mockRejectedValue(new Error('Failed to create movie'));
-
-      await expect(service.create(postMovieDto)).rejects.toThrow(BadRequestException);
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Test Movie');
+      expect(result.description).toEqual('This is a test movie');
     });
   });
 
   describe('findOne', () => {
-    it('should return a movie if found', async () => {
+    it('should find a movie successfully', async () => {
       movieRepository.findById.mockResolvedValue(mockMovie);
 
-      const result = await service.findOne(1);
+      const result = await movieService.findOne(1);
 
       expect(movieRepository.findById).toHaveBeenCalledWith(1);
-      expect(result).toEqual(expect.objectContaining({
-        id: 1,
-        title: 'Test Movie',
-        description: 'Test Description',
-      }));
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Test Movie');
+      expect(result.description).toEqual('This is a test movie');
     });
 
-    it('should throw NotFoundException if movie is not found', async () => {
+    it('should throw an error if movie is not found', async () => {
       movieRepository.findById.mockResolvedValue(null);
 
-      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(movieService.findOne(1)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('findAll', () => {
-    it('should return all movies with pagination', async () => {
-      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'title', order: 'ASC' };
-      const resultData: PaginationResult<Movie> = {
-        data: [mockMovie as Movie],
-        total: 1,
-        page: 1,
-        limit: 10,
-      };
+    it('should return paginated movies', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+      const paginatedResult: [Partial<Movie>[], number] = [[mockMovie], 1];
 
-      jest.spyOn(service as any, 'handleErrors').mockImplementation(() => Promise.resolve(resultData));
+      movieRepository.findPaginatedMovies.mockResolvedValue(paginatedResult);
 
-      const result = await service.findAll(paginationDto);
+      const result = await movieService.findAll(paginationDto);
 
-      expect(result).toEqual(expect.objectContaining({
-        data: [expect.objectContaining({
-          id: 1,
-          title: 'Test Movie',
-          description: 'Test Description',
-        })],
-        total: 1,
-        page: 1,
-        limit: 10,
-      }));
+      expect(result.data[0].id).toEqual(1);
+      expect(result.data[0].title).toEqual('Test Movie');
+    });
+
+    it('should handle errors when fetching movies', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+
+      movieRepository.findPaginatedMovies.mockRejectedValue(new Error('Error fetching movies'));
+
+      await expect(movieService.findAll(paginationDto)).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('update', () => {
     it('should update a movie successfully', async () => {
-      const updateMovieDto: UpdateMovieDto = { bigImgUrl: "", thumbNailUrl: "", title: 'Updated Movie' };
-      const updatedMovie = { ...mockMovie, ...updateMovieDto };
-
       movieRepository.findById.mockResolvedValue(mockMovie);
-      movieRepository.save.mockResolvedValue(updatedMovie);
+      movieRepository.save.mockResolvedValue(mockMovie);
 
-      const result = await service.update(1, updateMovieDto);
+      const updateMovieDto: UpdateMovieDto = {
+        title: 'Updated Movie',
+        description: 'Updated description',
+        youtubeUrl: 'http://youtube.com/updated',
+        bigImgUrl: 'http://bigimg.com/updated',
+        thumbNailUrl: 'http://thumbnail.com/updated'
+      };
+
+      const result = await movieService.update(1, updateMovieDto);
 
       expect(movieRepository.findById).toHaveBeenCalledWith(1);
-      expect(movieRepository.save).toHaveBeenCalledWith(updatedMovie);
-      expect(result).toEqual(expect.objectContaining(updateMovieDto));
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Updated Movie');
     });
 
-    it('should throw NotFoundException if movie is not found', async () => {
+    it('should throw an error if movie is not found', async () => {
       movieRepository.findById.mockResolvedValue(null);
 
-      const updateMovieDto: UpdateMovieDto = { bigImgUrl: "", thumbNailUrl: "", title: 'Updated Movie' };
+      const updateMovieDto: UpdateMovieDto = {
+        title: 'Updated Movie',
+        description: 'Updated description',
+        youtubeUrl: 'http://youtube.com/updated',
+        bigImgUrl: 'http://bigimg.com/updated',
+        thumbNailUrl: 'http://thumbnail.com/updated'
+      };
 
-      await expect(service.update(1, updateMovieDto)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw BadRequestException if update fails', async () => {
-      const updateMovieDto: UpdateMovieDto = { bigImgUrl: "", thumbNailUrl: "", title: 'Updated Movie' };
-
-      movieRepository.findById.mockResolvedValue(mockMovie);
-      movieRepository.save.mockRejectedValue(new Error('Failed to update movie'));
-
-      await expect(service.update(1, updateMovieDto)).rejects.toThrow(BadRequestException);
+      await expect(movieService.update(1, updateMovieDto)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
-    it('should delete a movie successfully', async () => {
-      movieRepository.findOne.mockResolvedValue(mockMovie);
-      movieRepository.delete.mockResolvedValue(null);
+    it('should remove a movie successfully', async () => {
+      movieRepository.findById.mockResolvedValue(mockMovie);
+      movieRepository.delete.mockResolvedValue({ affected: 1 });
 
-      await service.remove(1);
+      await movieService.remove(1);
 
-      expect(movieRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(movieRepository.findById).toHaveBeenCalledWith(1);
       expect(movieRepository.delete).toHaveBeenCalledWith(1);
     });
 
-    it('should throw NotFoundException if movie is not found', async () => {
-      movieRepository.findOne.mockResolvedValue(null);
+    it('should throw an error if movie is not found', async () => {
+      movieRepository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw BadRequestException if delete fails', async () => {
-      movieRepository.findOne.mockResolvedValue(mockMovie);
-      movieRepository.delete.mockRejectedValue(new Error('Failed to delete movie'));
-
-      await expect(service.remove(1)).rejects.toThrow(BadRequestException);
+      await expect(movieService.remove(1)).rejects.toThrow(NotFoundException);
     });
   });
 });

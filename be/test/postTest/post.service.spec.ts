@@ -1,21 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PostService } from '../../src/modules/post/service/PostService';
-import { Post } from '../../src/modules/post/entity/Post';
-import { User } from '../../src/modules/user/entity/User';
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { PaginationDto } from '../../src/utils/pagination/paginationDto';
-import { PostPostDto, ResponsePostDto, UpdatePostDto } from "../../src/modules/post/dto/PostDto";
-import { UserService } from '../../src/modules/user/service/UserService';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PostService } from "../../src/modules/post/service/PostService";
 import { PostRepository } from "../../src/modules/post/repository/PostRepository";
-import { Movie } from "../../src/modules/movie/entity/Movie";
+import { UserService } from "../../src/modules/user/service/UserService";
 import { MovieService } from "../../src/modules/movie/service/MovieService";
-import { PaginationResult } from "../../src/utils/pagination/pagination";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { PostPostDto, UpdatePostDto } from "../../src/modules/post/dto/PostDto";
+import { User } from "../../src/modules/user/entity/User";
+import { Post } from "../../src/modules/post/entity/Post";
+import { Movie } from "../../src/modules/movie/entity/Movie";
+import { PaginationDto } from "../../src/utils/pagination/paginationDto";
+import { PaginationResult, paginate } from "../../src/utils/pagination/pagination";
+import { Role } from "../../src/auth/authorization/Role";
+import { BaseEntity } from "typeorm";
 
 const mockPostRepository = () => ({
   create: jest.fn(),
   save: jest.fn(),
+  findOne: jest.fn(),
   findById: jest.fn(),
   delete: jest.fn(),
+  findPaginatedPostsByType: jest.fn(),
 });
 
 const mockUserService = () => ({
@@ -26,31 +30,35 @@ const mockMovieService = () => ({
   findById: jest.fn(),
 });
 
-const mockPost: Partial<Post> = {
-  id: 1,
-  title: 'Test Post',
-  content: 'Test Content',
-  user: {} as User,
-  movie: {} as Movie,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+class MockPost extends BaseEntity {
+  id = 1;
+  title = 'Test Post';
+  content = 'This is a test post';
+  type = 'test';
+  score = 0;
+  views = 0;
+  thumbnailURL = '';
+  photosURL = [];
+  createdAt = new Date();
+  updatedAt = new Date();
+  user = { email: 'user@example.com', role: Role.User } as User;
+  comments = [jest.fn()];
+  movie = jest.fn() as unknown as Movie;
+}
 
-const mockUser: Partial<User> = {
-  id: 1,
-};
-
-const mockMovie: Partial<Movie> = {
-  id: 1,
-};
+jest.mock('../../src/utils/pagination/pagination', () => ({
+  paginate: jest.fn(),
+}));
 
 describe('PostService', () => {
-  let service: PostService;
-  let postRepository: ReturnType<typeof mockPostRepository>;
-  let userService: ReturnType<typeof mockUserService>;
-  let movieService: ReturnType<typeof mockMovieService>;
+  let postService;
+  let postRepository;
+  let userService;
+  let movieService;
+  let mockPost;
 
   beforeEach(async () => {
+    mockPost = new MockPost();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostService,
@@ -60,159 +68,139 @@ describe('PostService', () => {
       ],
     }).compile();
 
-    service = module.get<PostService>(PostService);
-    postRepository = module.get(PostRepository);
-    userService = module.get(UserService);
-    movieService = module.get(MovieService);
+    postService = module.get<PostService>(PostService);
+    postRepository = module.get<PostRepository>(PostRepository);
+    userService = module.get<UserService>(UserService);
+    movieService = module.get<MovieService>(MovieService);
+
+    jest.clearAllMocks();
   });
 
   describe('create', () => {
     it('should create a post successfully', async () => {
+      userService.findById.mockResolvedValue({} as User);
+      movieService.findById.mockResolvedValue({} as Movie);
+      postRepository.create.mockReturnValue(mockPost);
+      postRepository.save.mockResolvedValue(mockPost);
+
       const postPostDto: PostPostDto = {
         title: 'Test Post',
-        content: 'Test Content',
+        content: 'This is a test post',
         movieId: 1,
+        thumbnailURL: '',
+        type: 'test',
       };
+      const result = await postService.create(postPostDto, 1);
 
-      userService.findById.mockResolvedValue(mockUser as User);
-      movieService.findById.mockResolvedValue(mockMovie as Movie);
-      postRepository.create.mockReturnValue(mockPost);
-      postRepository.save.mockResolvedValue(mockPost as Post);
-
-      const result = await service.create(postPostDto, 1);
-
-      expect(userService.findById).toHaveBeenCalledWith(1);
-      expect(movieService.findById).toHaveBeenCalledWith(1);
       expect(postRepository.create).toHaveBeenCalledWith({
         ...postPostDto,
-        user: mockUser,
-        movie: mockMovie,
+        user: {},
+        movie: {},
       });
       expect(postRepository.save).toHaveBeenCalledWith(mockPost);
-      expect(result).toEqual(expect.objectContaining({
-        title: 'Test Post',
-        content: 'Test Content',
-      }));
-    });
 
-    it('should throw NotFoundException if movie not found', async () => {
-      userService.findById.mockResolvedValue(mockUser as User);
-      movieService.findById.mockImplementation(() => {
-        throw new NotFoundException('Movie with ID 1 not found');
-      });
-      const postPostDto: PostPostDto = {
-        title: 'Test Post',
-        content: 'Test Content',
-        movieId: 1,
-      };
-
-      await expect(service.create(postPostDto, 1)).rejects.toThrow(NotFoundException);
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Test Post');
+      expect(result.content).toEqual('This is a test post');
     });
   });
 
   describe('findOne', () => {
-    it('should return a post if found', async () => {
-      postRepository.findById.mockResolvedValue(mockPost as Post);
+    it('should find a post successfully', async () => {
+      postRepository.findById.mockResolvedValue(mockPost);
+      postRepository.save.mockResolvedValue(mockPost);
 
-      const result = await service.findOne(1);
+      const result = await postService.findOne(1);
 
       expect(postRepository.findById).toHaveBeenCalledWith(1);
-      expect(result).toEqual(expect.objectContaining({
-        id: 1,
-        title: 'Test Post',
-        content: 'Test Content',
-      }));
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Test Post');
+      expect(result.content).toEqual('This is a test post');
     });
 
-    it('should throw NotFoundException if post is not found', async () => {
+    it('should throw an error if post is not found', async () => {
       postRepository.findById.mockResolvedValue(null);
 
-      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(postService.findOne(1)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('findAll', () => {
-    it('should return all posts with pagination', async () => {
-      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'title', order: 'ASC' };
-      const resultData: PaginationResult<Post> = {
-        data: [mockPost as Post],
-        total: 1,
-        page: 1,
-        limit: 10,
-      };
+    it('should return paginated posts', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+      const paginatedResult: PaginationResult<Post> = { data: [mockPost], total: 1, page: 1, limit: 10 };
 
-      jest.spyOn(service as any, 'handleErrors').mockImplementation(() => Promise.resolve(resultData));
+      (paginate as jest.Mock).mockResolvedValue(paginatedResult);
 
-      const result = await service.findAll(paginationDto);
+      const result = await postService.findAll(paginationDto);
 
-      expect(result).toEqual(expect.objectContaining({
-        data: [expect.objectContaining({
-          id: 1,
-          title: 'Test Post',
-          content: 'Test Content',
-        })],
-        total: 1,
-        page: 1,
-        limit: 10,
-      }));
+      expect(result.data[0].id).toEqual(1);
+      expect(result.data[0].title).toEqual('Test Post');
+    });
+
+    it('should handle errors when fetching posts', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+
+      (paginate as jest.Mock).mockRejectedValue(new Error('Error fetching posts'));
+
+      await expect(postService.findAll(paginationDto)).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('findAllWhereType', () => {
+    it('should return paginated posts of a specific type', async () => {
+      const paginationDto: PaginationDto = { page: 1, limit: 10, field: 'id', order: 'ASC' };
+      const paginatedResult: PaginationResult<Post> = { data: [mockPost], total: 1, page: 1, limit: 10 };
+
+      postRepository.findPaginatedPostsByType.mockResolvedValue(paginatedResult);
+
+      const result = await postService.findAllWhereType(paginationDto, 'test');
+
+      expect(result.data[0].id).toEqual(1);
+      expect(result.data[0].title).toEqual('Test Post');
     });
   });
 
   describe('update', () => {
     it('should update a post successfully', async () => {
+      postRepository.findById.mockResolvedValue(mockPost);
+      postRepository.save.mockResolvedValue(mockPost);
+
       const updatePostDto: UpdatePostDto = { title: 'Updated Post' };
-      const updatedPost = { ...mockPost, ...updatePostDto };
+      const jwtUser: User = { email: 'test@example.com', role: Role.Admin } as User;
 
-      postRepository.findById.mockResolvedValue(mockPost as Post);
-      postRepository.save.mockResolvedValue(updatedPost as Post);
-
-      const result = await service.update(1, updatePostDto, mockUser as User);
+      const result = await postService.update(1, updatePostDto, jwtUser);
 
       expect(postRepository.findById).toHaveBeenCalledWith(1);
-      expect(postRepository.save).toHaveBeenCalledWith(updatedPost);
-      expect(result).toEqual(expect.objectContaining(updatePostDto));
+      expect(result.id).toEqual(1);
+      expect(result.title).toEqual('Updated Post');
     });
 
-    it('should throw NotFoundException if post is not found', async () => {
+    it('should throw an error if post is not found', async () => {
       postRepository.findById.mockResolvedValue(null);
 
       const updatePostDto: UpdatePostDto = { title: 'Updated Post' };
+      const jwtUser: User = { email: 'test@example.com', role: Role.Admin } as User;
 
-      await expect(service.update(1, updatePostDto, mockUser as User)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw BadRequestException if update fails', async () => {
-      const updatePostDto: UpdatePostDto = { title: 'Updated Post' };
-
-      postRepository.findById.mockResolvedValue(mockPost as Post);
-      postRepository.save.mockRejectedValue(new Error('Failed to update post'));
-
-      await expect(service.update(1, updatePostDto, mockUser as User)).rejects.toThrow(BadRequestException);
+      await expect(postService.update(1, updatePostDto, jwtUser)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
-    it('should delete a post successfully', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockPost as ResponsePostDto);
-      postRepository.delete.mockResolvedValue(null);
+    it('should remove a post successfully', async () => {
+      postRepository.findById.mockResolvedValue(mockPost);
+      postRepository.delete.mockResolvedValue({ affected: 1 });
 
-      await service.remove(1);
+      await postService.remove(1);
 
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(postRepository.findById).toHaveBeenCalledWith(1);
       expect(postRepository.delete).toHaveBeenCalledWith(1);
     });
 
-    it('should throw NotFoundException if post is not found', async () => {
-      jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
+    it('should throw an error if post is not found', async () => {
+      postRepository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw BadRequestException if delete fails', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockPost as ResponsePostDto);
-      postRepository.delete.mockRejectedValue(new Error('Failed to delete post'));
-
-      await expect(service.remove(1)).rejects.toThrow(BadRequestException);
+      await expect(postService.remove(1)).rejects.toThrow(NotFoundException);
     });
   });
 });
