@@ -3,6 +3,9 @@
 ## 배포 주소
 - https://www.moviemovit.xyz
 
+## Notion 주소
+- https://www.notion.so/Movie-Movit-668de31827134654a1f970218a0fd651
+
 ## 작업 기간
 - 2024.06.10 - 2024.06.27
 
